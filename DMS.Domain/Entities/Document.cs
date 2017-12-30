@@ -10,7 +10,7 @@ namespace DMS.Domain.Entities
     //public Guid Id { get; protected set; }
     public DateTime Created { get; protected set; }
     public DateTime Modified { get; protected set; }
-    public User Author { get; protected set; }
+    public ApplicationUser Author { get; protected set; }
 
     private List<StatusChange> _statusChanges = new List<StatusChange>();
     public IReadOnlyCollection<StatusChange> StatusChanges => _statusChanges;
@@ -21,7 +21,7 @@ namespace DMS.Domain.Entities
     //Empty constructor for EF
     protected Document() { }
 
-    public Document(string title, string body, User author)
+    public Document(string title, string body, ApplicationUser author)
     {
       if (string.IsNullOrWhiteSpace(title))
       {
@@ -51,7 +51,7 @@ namespace DMS.Domain.Entities
       return _statusChanges[_statusChanges.Count - 1];
     }
 
-    public void ChangeStatus(User changeAuthor, DocumentStatus newStatus, string message, DateTime changeDateTime)
+    public void ChangeStatus(ApplicationUser changeAuthor, DocumentStatus newStatus, string message, DateTime changeDateTime)
     {
       var lastStatusChange = GetLastStatus();
       DocumentStatus currentStatus;
@@ -93,14 +93,14 @@ namespace DMS.Domain.Entities
       if ((newStatus == DocumentStatus.Declined || newStatus == DocumentStatus.Accepted)
         && currentStatus != DocumentStatus.Approved)
       {
-        throw new InvalidOperationException("Document can only be reviewed by expert after approved by operator"));
+        throw new InvalidOperationException("Document can only be reviewed by expert after approved by operator");
       }
 
       _statusChanges.Add(new StatusChange(changeAuthor, newStatus, message, changeDateTime));
     }
 
 
-    public void EditDocument(User editAuthor, string title, string body)
+    public void EditDocument(ApplicationUser editAuthor, string title, string body)
     {
       if (string.IsNullOrWhiteSpace(title))
       {

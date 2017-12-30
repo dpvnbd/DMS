@@ -7,7 +7,7 @@ namespace DMS.Domain.Entities
   public class StatusChange
   {
     //public Guid Id { get; protected set; }
-    public User ChangeAuthor { get; protected set; }
+    public ApplicationUser ChangeAuthor { get; protected set; }
     public DocumentStatus Status { get; protected set; }
     public string Message { get; protected set; }
 
@@ -15,7 +15,7 @@ namespace DMS.Domain.Entities
     // Empty constructor for EF
     protected StatusChange() { }
 
-    public StatusChange(User changeAuthor, DocumentStatus newStatus, string message, DateTime created)
+    public StatusChange(ApplicationUser changeAuthor, DocumentStatus newStatus, string message, DateTime created)
     {
       ChangeAuthor = changeAuthor ?? throw new ArgumentNullException(nameof(changeAuthor));
       Message = message ?? throw new ArgumentNullException(nameof(message));

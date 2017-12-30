@@ -4,16 +4,16 @@ using System.Text;
 
 namespace DMS.Domain.Entities
 {
-  public class User
+  public class ApplicationUser
   {
     public Guid Id { get; protected set; }
     public string FirstName { get; protected set; }
     public string LastName { get; protected set; }
     public UserRole Role { get; protected set; }
 
-    protected User() { } // Empty constructor for EF
+    protected ApplicationUser() { } // Empty constructor for EF
 
-    public User(Guid id, string firstName, string lastName, UserRole role)
+    public ApplicationUser(Guid id, string firstName, string lastName, UserRole role)
     {
       if (string.IsNullOrWhiteSpace(firstName))
       {
