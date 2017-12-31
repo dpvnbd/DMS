@@ -1,13 +1,14 @@
-﻿using System;
+﻿using DMS.Domain.Abstract;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace DMS.Domain.Entities
 {
-  public class StatusChange
+  public class StatusChange : BaseEntity
   {
-    //public Guid Id { get; protected set; }
     public ApplicationUser ChangeAuthor { get; protected set; }
+    public Document Document { get; protected set; }
     public DocumentStatus Status { get; protected set; }
     public string Message { get; protected set; }
 
@@ -20,7 +21,7 @@ namespace DMS.Domain.Entities
       ChangeAuthor = changeAuthor ?? throw new ArgumentNullException(nameof(changeAuthor));
       Message = message ?? throw new ArgumentNullException(nameof(message));
 
-      if(changeAuthor.Role == UserRole.Customer &&
+      if (changeAuthor.Role == UserRole.Customer &&
         newStatus != DocumentStatus.Submitted && newStatus != DocumentStatus.Created)
       {
         throw new ArgumentException("Custormer can only create and submit documents", nameof(newStatus));
@@ -30,7 +31,7 @@ namespace DMS.Domain.Entities
         (newStatus == DocumentStatus.Declined && newStatus != DocumentStatus.Accepted))
       {
         throw new ArgumentException("Operator can't decline or accept documents", nameof(newStatus));
-      }      
+      }
 
       Status = newStatus;
       Created = created;

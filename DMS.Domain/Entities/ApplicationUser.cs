@@ -1,19 +1,19 @@
-﻿using System;
+﻿using DMS.Domain.Abstract;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace DMS.Domain.Entities
 {
-  public class ApplicationUser
+  public class ApplicationUser : BaseEntity
   {
-    public Guid Id { get; protected set; }
     public string FirstName { get; protected set; }
     public string LastName { get; protected set; }
     public UserRole Role { get; protected set; }
 
     protected ApplicationUser() { } // Empty constructor for EF
 
-    public ApplicationUser(Guid id, string firstName, string lastName, UserRole role)
+    public ApplicationUser(string firstName, string lastName, UserRole role)
     {
       if (string.IsNullOrWhiteSpace(firstName))
       {
@@ -25,7 +25,6 @@ namespace DMS.Domain.Entities
         throw new ArgumentException("Name is empty", nameof(lastName));
       }
 
-      Id = id;
       Role = role;
     }
   }

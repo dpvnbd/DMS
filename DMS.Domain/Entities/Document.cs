@@ -2,12 +2,12 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Text;
+using DMS.Domain.Abstract;
 
 namespace DMS.Domain.Entities
 {
-  public class Document //:IAggregateRoot
+  public class Document : BaseEntity //:IAggregateRoot
   {
-    //public Guid Id { get; protected set; }
     public DateTime Created { get; protected set; }
     public DateTime Modified { get; protected set; }
     public ApplicationUser Author { get; protected set; }
@@ -116,9 +116,9 @@ namespace DMS.Domain.Entities
       {
         throw new ArgumentException("Only author or experts can edit the document", nameof(editAuthor));
       }
-      
+
       var lastStatus = GetLastStatus();
-      if(lastStatus == null || lastStatus.Status == DocumentStatus.Created || lastStatus.Status == DocumentStatus.Rejected)
+      if (lastStatus == null || lastStatus.Status == DocumentStatus.Created || lastStatus.Status == DocumentStatus.Rejected)
       {
         throw new InvalidOperationException("Only just created or rejected documents can be edited");
       }

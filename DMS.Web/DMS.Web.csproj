@@ -10,6 +10,13 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.3" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DMS.Application\DMS.Application.csproj" />
+    <ProjectReference Include="..\DMS.Domain\DMS.Domain.csproj" />
+    <ProjectReference Include="..\DMS.Infrastructure\DMS.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
