@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DMS.Domain.Abstract;
+using DMS.Infrastructure;
 using DMS.Infrastructure.Data;
 using DMS.Infrastructure.Data.Identity;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -42,6 +44,7 @@ namespace DMS.Web
         .AddEntityFrameworkStores<AppDbContext>()
         .AddDefaultTokenProviders();
 
+      services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
       services.AddMvc();
     }
 
@@ -54,7 +57,7 @@ namespace DMS.Web
       }
 
       app.UseAuthentication();
-
+      app.UseStaticFiles();
       app.UseMvcWithDefaultRoute();
     }
   }
