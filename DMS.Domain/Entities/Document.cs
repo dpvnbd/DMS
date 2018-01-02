@@ -10,7 +10,7 @@ namespace DMS.Domain.Entities
   {
     public DateTime Created { get; protected set; }
     public DateTime Modified { get; protected set; }
-    public ApplicationUser Author { get; protected set; }
+    public AppUser Author { get; protected set; }
 
     private List<StatusChange> _statusChanges = new List<StatusChange>();
     public IReadOnlyCollection<StatusChange> StatusChanges => _statusChanges;
@@ -21,7 +21,7 @@ namespace DMS.Domain.Entities
     //Empty constructor for EF
     protected Document() { }
 
-    public Document(string title, string body, ApplicationUser author)
+    public Document(string title, string body, AppUser author)
     {
       if (string.IsNullOrWhiteSpace(title))
       {
@@ -51,7 +51,7 @@ namespace DMS.Domain.Entities
       return _statusChanges[_statusChanges.Count - 1];
     }
 
-    public void ChangeStatus(ApplicationUser changeAuthor, DocumentStatus newStatus, string message, DateTime changeDateTime)
+    public void ChangeStatus(AppUser changeAuthor, DocumentStatus newStatus, string message, DateTime changeDateTime)
     {
       var lastStatusChange = GetLastStatus();
       DocumentStatus currentStatus;
@@ -100,7 +100,7 @@ namespace DMS.Domain.Entities
     }
 
 
-    public void EditDocument(ApplicationUser editAuthor, string title, string body)
+    public void EditDocument(AppUser editAuthor, string title, string body)
     {
       if (string.IsNullOrWhiteSpace(title))
       {

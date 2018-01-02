@@ -13,8 +13,8 @@ namespace DMS.Web.Controllers
     {
       var documents = new List<Document>
       {
-        new Document("Title", "Body", new ApplicationUser("Test", "User", UserRole.Customer)),
-        new Document("Title2", "Body2", new ApplicationUser("Test", "User", UserRole.Customer)),        
+        new Document("Title", "Body", new AppUser("Test", "User", UserRole.Customer)),
+        new Document("Title2", "Body2", new AppUser("Test", "User", UserRole.Customer)),        
       };
       return View(documents);
     }

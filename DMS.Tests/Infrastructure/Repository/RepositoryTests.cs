@@ -1,4 +1,5 @@
-﻿using DMS.Infrastructure.Data;
+﻿using DMS.Infrastructure;
+using DMS.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;

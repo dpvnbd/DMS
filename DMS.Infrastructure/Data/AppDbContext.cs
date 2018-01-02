@@ -1,16 +1,18 @@
-﻿using System;
+﻿using DMS.Domain.Entities;
+using DMS.Infrastructure.Data.Configurations;
+using DMS.Infrastructure.Data.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using DMS.Domain.Entities;
-using DMS.Infrastructure.Data.Configurations;
-using Microsoft.EntityFrameworkCore;
 
 namespace DMS.Infrastructure.Data
 {
-  public class AppDbContext : DbContext
+  public class AppDbContext : IdentityDbContext<AppIdentityUser, AppIdentityRole, string>
   {
     public DbSet<Document> Documents { get; set; }
-    public DbSet<ApplicationUser> Users { get; set; }
+    public DbSet<AppUser> DomainUsers { get; set; }
     public DbSet<StatusChange> StatusChanges { get; set; }
 
     public AppDbContext(DbContextOptions options) : base(options)
@@ -19,9 +21,12 @@ namespace DMS.Infrastructure.Data
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-      modelBuilder.ApplyConfiguration(new ApplicationUserEntityTypeConfiguration());
+      base.OnModelCreating(modelBuilder);
+
+      modelBuilder.ApplyConfiguration(new AppUserEntityTypeConfiguration());
       modelBuilder.ApplyConfiguration(new DocumentEntityTypeConfiguration());
       modelBuilder.ApplyConfiguration(new StatusChangeEntityTypeConfiguration());
+      modelBuilder.ApplyConfiguration(new AppIdentityUserEntityTypeConfiguration());
     }
   }
 }

@@ -7,9 +7,9 @@ using System.Text;
 
 namespace DMS.Infrastructure.Data.Configurations
 {
-  class ApplicationUserEntityTypeConfiguration : IEntityTypeConfiguration<ApplicationUser>
+  class AppUserEntityTypeConfiguration : IEntityTypeConfiguration<AppUser>
   {
-    public void Configure(EntityTypeBuilder<ApplicationUser> builder)
+    public void Configure(EntityTypeBuilder<AppUser> builder)
     {
       builder.HasKey(u => u.Id);
     }
