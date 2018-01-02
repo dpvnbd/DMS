@@ -25,6 +25,8 @@ namespace DMS.Domain.Entities
         throw new ArgumentException("Name is empty", nameof(lastName));
       }
 
+      FirstName = firstName;
+      LastName = lastName;
       Role = role;
     }
   }
