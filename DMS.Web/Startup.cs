@@ -31,7 +31,7 @@ namespace DMS.Web
       services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DMS")));
 
-      services.AddIdentity<AppIdentityUser, IdentityRole>(options =>
+      services.AddIdentity<AppIdentityUser, AppIdentityRole>(options =>
       {
         // Password settings
         options.Password.RequireDigit = false;
