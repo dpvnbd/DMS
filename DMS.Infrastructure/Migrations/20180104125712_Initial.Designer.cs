@@ -12,8 +12,8 @@ using System;
 namespace DMS.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20180102095603_Identity")]
-    partial class Identity
+    [Migration("20180104125712_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -27,8 +27,6 @@ namespace DMS.Infrastructure.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("AppIdentityUserId");
-
                     b.Property<string>("FirstName");
 
                     b.Property<string>("LastName");
@@ -36,10 +34,6 @@ namespace DMS.Infrastructure.Migrations
                     b.Property<int>("Role");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AppIdentityUserId")
-                        .IsUnique()
-                        .HasFilter("[AppIdentityUserId] IS NOT NULL");
 
                     b.ToTable("DomainUsers");
                 });
@@ -121,6 +115,8 @@ namespace DMS.Infrastructure.Migrations
 
                     b.Property<int>("AccessFailedCount");
 
+                    b.Property<int>("AppUserId");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
 
@@ -153,6 +149,9 @@ namespace DMS.Infrastructure.Migrations
                         .HasMaxLength(256);
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AppUserId")
+                        .IsUnique();
 
                     b.HasIndex("NormalizedEmail")
                         .HasName("EmailIndex");
@@ -249,13 +248,6 @@ namespace DMS.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("DMS.Domain.Entities.AppUser", b =>
-                {
-                    b.HasOne("DMS.Infrastructure.Data.Identity.AppIdentityUser")
-                        .WithOne("AppUser")
-                        .HasForeignKey("DMS.Domain.Entities.AppUser", "AppIdentityUserId");
-                });
-
             modelBuilder.Entity("DMS.Domain.Entities.Document", b =>
                 {
                     b.HasOne("DMS.Domain.Entities.AppUser", "Author")
@@ -272,6 +264,14 @@ namespace DMS.Infrastructure.Migrations
                     b.HasOne("DMS.Domain.Entities.Document", "Document")
                         .WithMany("StatusChanges")
                         .HasForeignKey("DocumentId");
+                });
+
+            modelBuilder.Entity("DMS.Infrastructure.Data.Identity.AppIdentityUser", b =>
+                {
+                    b.HasOne("DMS.Domain.Entities.AppUser", "AppUser")
+                        .WithOne()
+                        .HasForeignKey("DMS.Infrastructure.Data.Identity.AppIdentityUser", "AppUserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

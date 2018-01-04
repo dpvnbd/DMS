@@ -12,7 +12,7 @@ namespace DMS.Infrastructure.Data.Configurations
   {
     public void Configure(EntityTypeBuilder<AppIdentityUser> builder)
     {
-      builder.HasOne(u => u.AppUser).WithOne().HasForeignKey<AppUser>();
+      builder.HasOne(u => u.AppUser).WithOne().HasForeignKey<AppIdentityUser>(u => u.AppUserId);
     }
   }
 }

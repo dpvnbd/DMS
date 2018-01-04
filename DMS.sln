@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DMS.Domain", "DMS.Domain\DM
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DMS.Infrastructure", "DMS.Infrastructure\DMS.Infrastructure.csproj", "{5CD91C3B-4B8B-4955-81E1-ABD5B7632D9E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DMS.Tests", "DMS.Tests\DMS.Tests.csproj", "{B0B739CA-85E2-4950-A129-4BFED0271B57}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DMS.Tests", "DMS.Tests\DMS.Tests.csproj", "{B0B739CA-85E2-4950-A129-4BFED0271B57}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DMS.Application", "DMS.Application\DMS.Application.csproj", "{17432AFD-268C-4793-AF1C-223F54FC6F3E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{B0B739CA-85E2-4950-A129-4BFED0271B57}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0B739CA-85E2-4950-A129-4BFED0271B57}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B0B739CA-85E2-4950-A129-4BFED0271B57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17432AFD-268C-4793-AF1C-223F54FC6F3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17432AFD-268C-4793-AF1C-223F54FC6F3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17432AFD-268C-4793-AF1C-223F54FC6F3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17432AFD-268C-4793-AF1C-223F54FC6F3E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

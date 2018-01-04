@@ -1,4 +1,5 @@
 ﻿using DMS.Domain.Abstract;
+using DMS.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -17,15 +18,19 @@ namespace DMS.Infrastructure
       _dbContext = context;
     }
 
+    public Repository(AppDbContext context)
+    {
+      _dbContext = context;
+    }
+
     public IQueryable<TEntity> GetAll()
     {
-      return _dbContext.Set<TEntity>().AsNoTracking();
+      return _dbContext.Set<TEntity>();
     }
 
     public async Task<TEntity> GetById(int id)
     {
       return await _dbContext.Set<TEntity>()
-                .AsNoTracking()
                 .FirstOrDefaultAsync(e => e.Id == id);
     }
 

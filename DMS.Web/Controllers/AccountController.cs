@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using DMS.Application.Authentication;
+using DMS.Application.DTOs.Authentication;
 using DMS.Domain.Abstract;
 using DMS.Domain.Entities;
 using DMS.Infrastructure.Data.Identity;
@@ -13,16 +16,13 @@ namespace DMS.Web.Controllers
 {
   public class AccountController : Controller
   {
-    private readonly SignInManager<AppIdentityUser> signInManager;
-    private readonly UserManager<AppIdentityUser> userManager;
-    private readonly IRepository<AppUser> userRepo;
+    private readonly IAuthService authService;
+    private readonly IMapper mapper;
 
-    public AccountController(SignInManager<AppIdentityUser> signInManager, UserManager<AppIdentityUser> userManager,
-      IRepository<AppUser> userRepo)
+    public AccountController(IAuthService authService, IMapper mapper)
     {
-      this.signInManager = signInManager;
-      this.userManager = userManager;
-      this.userRepo = userRepo;
+      this.authService = authService;
+      this.mapper = mapper;
     }
 
     [HttpGet]
@@ -36,33 +36,16 @@ namespace DMS.Web.Controllers
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
       if (!ModelState.IsValid)
+      {
         return View(model);
+      }
 
-      var identityUser = new AppIdentityUser
+      var registerDto = mapper.Map<RegisterDto>(model);
+
+      var success = await authService.Register(registerDto);
+      if (success)
       {
-        UserName = model.UserName,
-        Email = model.Email,
-      };
-
-      var domainUser = new AppUser(model.FirstName, model.LastName, UserRole.Customer);
-
-
-      var result = await this.userManager.CreateAsync(identityUser, model.Password);
-      if (result.Succeeded)
-      {
-        await userRepo.Create(domainUser);
-
-        identityUser.AppUser = domainUser;
-        var linkDomainUserResult = await userManager.UpdateAsync(identityUser);
-
-        if (linkDomainUserResult.Succeeded)
-        {
-          return RedirectToAction("Index", "Home");
-        }
-        else
-        {
-          await userManager.DeleteAsync(identityUser);
-        }
+        return RedirectToAction("Login", "Account");
       }
 
       return View(model);
@@ -78,14 +61,18 @@ namespace DMS.Web.Controllers
     public async Task<IActionResult> Login(LoginViewModel model)
     {
       if (!ModelState.IsValid)
+      {
         return View(model);
+      }
 
-      var result = await signInManager.PasswordSignInAsync(
-          model.Username, model.Password,
-          isPersistent: true, lockoutOnFailure: false);
+      var loginDto = mapper.Map<LoginDto>(model);
 
-      if (result.Succeeded)
+      var success = await authService.Login(loginDto);
+
+      if (success)
+      {
         return RedirectToAction("Index", "Home");
+      }
 
       ModelState.AddModelError(string.Empty, "Login Failed");
       return View(model);
@@ -93,7 +80,7 @@ namespace DMS.Web.Controllers
 
     public async Task<IActionResult> Logout()
     {
-      await signInManager.SignOutAsync();
+      await authService.Logout();
       return RedirectToAction("Index", "Home");
     }
   }

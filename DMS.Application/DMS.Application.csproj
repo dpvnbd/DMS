@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DMS.Domain\DMS.Domain.csproj" />
+    <ProjectReference Include="..\DMS.Infrastructure\DMS.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

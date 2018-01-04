@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using DMS.Application.Authentication;
+using DMS.Application.Documents;
 using DMS.Domain.Abstract;
 using DMS.Infrastructure;
 using DMS.Infrastructure.Data;
@@ -29,7 +32,7 @@ namespace DMS.Web
     public void ConfigureServices(IServiceCollection services)
     {
       services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DMS")));
+                options.UseSqlServer(Configuration.GetConnectionString("DMS")).Ena‌​bleSensitiveDataLogg‌​ing());
 
       services.AddIdentity<AppIdentityUser, AppIdentityRole>(options =>
       {
@@ -44,7 +47,12 @@ namespace DMS.Web
         .AddEntityFrameworkStores<AppDbContext>()
         .AddDefaultTokenProviders();
 
-      services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
+      services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+      services.AddScoped<IAuthService, AuthService>();
+      services.AddScoped<IDocumentService, DocumentService>();
+
+      services.AddAutoMapper();
+
       services.AddMvc();
     }
 
