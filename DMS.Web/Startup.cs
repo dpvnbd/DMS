@@ -9,6 +9,7 @@ using DMS.Domain.Abstract;
 using DMS.Infrastructure;
 using DMS.Infrastructure.Data;
 using DMS.Infrastructure.Data.Identity;
+using DMS.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -48,8 +49,9 @@ namespace DMS.Web
         .AddDefaultTokenProviders();
 
       services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+      services.AddScoped<IDocumentRepository, DocumentRepository>();
       services.AddScoped<IAuthService, AuthService>();
-      services.AddScoped<IDocumentService, DocumentService>();
+      services.AddScoped<IAppDocumentService, AppDocumentService>();
 
       services.AddAutoMapper();
 

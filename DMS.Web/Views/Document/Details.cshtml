@@ -1,0 +1,103 @@
+﻿@model SubmitStatusChangeViewModel
+@using DMS.Application.DTOs.Documents
+@using DMS.Web.Models.Document
+@using DMS.Domain.Entities
+
+@{
+    ViewData["Title"] = "Document";
+    var d = (DocumentWithHistoryDto)ViewData["Document"];
+}
+
+
+<div class="card">
+    <div class="card-header">
+        <h2>@Html.DisplayFor(model => d.Title)</h2>
+        <h6 class="card-subtitle mb-2 text-muted">
+            Created by @Html.DisplayFor(model => d.Author.FullName) on
+            @Html.DisplayFor(model => d.Created)
+        </h6>
+    </div>
+    <div class="card-body">
+        <p class="card-text">
+            @Html.DisplayFor(model => d.Body)
+        </p>
+        <a href="#" class="card-link">
+            @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ })
+        </a>
+        <a asp-action="Index" class="card-link">Back to List</a>
+    </div>
+</div>
+
+
+
+@if (d.AvailableStatusChanges != null && d.AvailableStatusChanges.Any())
+{
+    <hr />
+    <div class="card">
+        <div class="card-header">
+            <h2>Review the document</h2>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                @Html.Hidden("DocumentId", d.Id)
+                <div class="form-group">
+                    <label asp-for="Message" class="control-label"></label>
+                    <input asp-for="Message" class="form-control" />
+                    <span asp-validation-for="Message" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    @foreach (var permission in d.AvailableStatusChanges)
+                    {
+                        switch (permission)
+                        {
+                            case DocumentStatus.Submitted:
+                                <button asp-action="Submit" type="submit" class="btn btn-primary">
+                                    Submit
+                                </button>
+                                break;
+                            case DocumentStatus.Approved:
+                                <button asp-action="Approve" type="submit" class="btn btn-success">
+                                    Approve
+                                </button>
+                                break;
+                            case DocumentStatus.Rejected:
+                                <button asp-action="Reject" type="submit" class="btn btn-warning">
+                                    Reject
+                                </button>
+                                break;
+                            case DocumentStatus.Accepted:
+                                <button asp-action="Accept" type="submit" class="btn btn-success">
+                                    Accept
+                                </button>
+                                break;
+                            case DocumentStatus.Declined:
+                                <button asp-action="Decline" type="submit" class="btn btn-danger">
+                                    Decline
+                                </button>
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
+                </div>
+            </form>
+        </div>
+    </div>
+}
+<hr />
+@foreach (var status in d.History.Reverse())
+{
+    <div class="card">
+        <div class="card-body">
+            <h6 class="card-subtitle mb-2 text-muted">
+                @Html.DisplayFor(m => status.Created)
+            </h6>
+            <p class="card-text">
+                @Html.DisplayFor(m => status.ChangeAuthor.FullName): @Html.DisplayFor(m => status.Status).
+                Message: @Html.DisplayFor(m => status.Message)
+            </p>
+        </div>
+    </div>
+}

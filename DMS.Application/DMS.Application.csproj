@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="6.2.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\DMS.Domain\DMS.Domain.csproj" />
     <ProjectReference Include="..\DMS.Infrastructure\DMS.Infrastructure.csproj" />
   </ItemGroup>

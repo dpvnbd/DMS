@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace DMS.Web.Infrastructure
 {
-  public class AutomapperProfile : Profile
+  public class ViewModelMappings : Profile
   {
-    public AutomapperProfile()
+    public ViewModelMappings()
     {
       CreateMap<RegisterViewModel, RegisterDto>();
       CreateMap<LoginViewModel, LoginDto>();

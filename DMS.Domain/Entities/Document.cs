@@ -12,8 +12,8 @@ namespace DMS.Domain.Entities
     public DateTime Modified { get; protected set; }
     public AppUser Author { get; protected set; }
 
-    private List<StatusChange> _statusChanges = new List<StatusChange>();
-    public IReadOnlyCollection<StatusChange> StatusChanges => _statusChanges;
+    private List<StatusChange> statusChanges = new List<StatusChange>();
+    public IReadOnlyCollection<StatusChange> StatusChanges => statusChanges;
 
     public string Title { get; protected set; }
     public string Body { get; protected set; }
@@ -39,64 +39,66 @@ namespace DMS.Domain.Entities
       Created = DateTime.Now;
       Modified = Created;
 
-      ChangeStatus(author, DocumentStatus.Created, "Document is created", Created);
+      statusChanges.Add(new StatusChange(author, DocumentStatus.Created, string.Empty, Created));
     }
 
-    public StatusChange GetLastStatus()
+    public StatusChange GetLastStatusChange()
     {
-      if (!_statusChanges.Any())
+      if (!statusChanges.Any())
       {
         return null;
       }
-      return _statusChanges[_statusChanges.Count - 1];
+      return statusChanges[statusChanges.Count - 1];
     }
 
-    public void ChangeStatus(AppUser changeAuthor, DocumentStatus newStatus, string message, DateTime changeDateTime)
+    public IEnumerable<DocumentStatus> AvailableStatusChanges(AppUser user)
     {
-      var lastStatusChange = GetLastStatus();
-      DocumentStatus currentStatus;
-      if (lastStatusChange == null && newStatus != DocumentStatus.Created)
+      var list = new List<DocumentStatus>();
+      var status = GetLastStatusChange().Status;
+      
+      var isAuthor = user.Id == Author.Id;
+      var isCustomer = user.Role == UserRole.Customer;
+      var isOperator = user.Role == UserRole.Operator;
+      var isExpert = user.Role == UserRole.Expert;
+
+
+      if ((status == DocumentStatus.Created || status == DocumentStatus.Rejected) && isAuthor)
       {
-        throw new InvalidOperationException("Document must have status \"Created\" first");
-      }
-      else if (lastStatusChange != null && newStatus == DocumentStatus.Created)
-      {
-        throw new InvalidOperationException("Document can only have \"Created\" status once");
-      }
-      else if (lastStatusChange == null)
-      {
-        currentStatus = DocumentStatus.Created;
-      }
-      else
-      {
-        currentStatus = GetLastStatus().Status;
+        list.Add(DocumentStatus.Submitted);
       }
 
-      if (newStatus == DocumentStatus.Submitted || newStatus == DocumentStatus.Created
-        && Author.Id != changeAuthor.Id)
+      if (status == DocumentStatus.Submitted && (isOperator || isExpert))
       {
-        throw new InvalidOperationException("Only document author can create or submit it");
+        list.Add(DocumentStatus.Approved);
+        list.Add(DocumentStatus.Rejected);
       }
 
-      if (newStatus == DocumentStatus.Submitted
-        && (currentStatus != DocumentStatus.Rejected || currentStatus != DocumentStatus.Created))
+      if (status == DocumentStatus.Approved && isExpert)
       {
-        throw new InvalidOperationException("Document can only be submitted when just created or rejected by operator");
+        list.Add(DocumentStatus.Accepted);
+        list.Add(DocumentStatus.Declined);
       }
 
-      if ((newStatus == DocumentStatus.Rejected || newStatus == DocumentStatus.Approved)
-        && currentStatus != DocumentStatus.Submitted)
+      return list;
+    }
+
+    public void ChangeStatus(AppUser changeAuthor, DocumentStatus newStatus, string message)
+    {
+      var availableChanges = AvailableStatusChanges(changeAuthor);
+
+      var canChange = availableChanges.Contains(newStatus);
+
+      if (!canChange)
       {
-        throw new InvalidOperationException("Document can only be reviewed by operator when submitted");
+        throw new InvalidOperationException("Can't change document status");
       }
 
-      if ((newStatus == DocumentStatus.Declined || newStatus == DocumentStatus.Accepted)
-        && currentStatus != DocumentStatus.Approved)
+      if(message == null)
       {
-        throw new InvalidOperationException("Document can only be reviewed by expert after approved by operator");
+        message = string.Empty;
       }
 
-      _statusChanges.Add(new StatusChange(changeAuthor, newStatus, message, changeDateTime));
+      statusChanges.Add(new StatusChange(changeAuthor, newStatus, message, DateTime.Now));
     }
 
 
@@ -117,7 +119,7 @@ namespace DMS.Domain.Entities
         throw new ArgumentException("Only author or experts can edit the document", nameof(editAuthor));
       }
 
-      var lastStatus = GetLastStatus();
+      var lastStatus = GetLastStatusChange();
       if (lastStatus == null || lastStatus.Status == DocumentStatus.Created || lastStatus.Status == DocumentStatus.Rejected)
       {
         throw new InvalidOperationException("Only just created or rejected documents can be edited");
