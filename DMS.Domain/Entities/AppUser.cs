@@ -9,6 +9,7 @@ namespace DMS.Domain.Entities
   {
     public string FirstName { get; protected set; }
     public string LastName { get; protected set; }
+    public string FullName => $"{FirstName} {LastName}";
     public UserRole Role { get; protected set; }
 
     protected AppUser() { } // Empty constructor for EF

@@ -9,6 +9,7 @@ namespace DMS.Application.DTOs.Documents
   {
     public int Id { get; set; }
     public int AuthorId { get; set; }
+    public string AuthorFullName { get; set; }
     public string Title { get; set; }
     public DocumentStatus CurrentDocumentStatus { get; set; }
   }
