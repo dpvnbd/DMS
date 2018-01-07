@@ -14,7 +14,7 @@ namespace DMS.Application.DTOs.Documents
     public string Title { get; set; }
     public string Body { get; set; }
     public IEnumerable<StatusChangeDto> History { get; set; }
-
+    public DocumentStatus CurrentDocumentStatus { get; set; }
     public IEnumerable<DocumentStatus> AvailableStatusChanges { get; set; }
   }
 }

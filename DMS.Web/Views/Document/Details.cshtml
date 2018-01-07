@@ -11,7 +11,7 @@
 
 <div class="card">
     <div class="card-header">
-        <h2>@Html.DisplayFor(model => d.Title)</h2>
+        <h2>@Html.DisplayFor(model => d.Title) <document-status status="@d.CurrentDocumentStatus"/></h2>
         <h6 class="card-subtitle mb-2 text-muted">
             Created by @Html.DisplayFor(model => d.Author.FullName) on
             @Html.DisplayFor(model => d.Created)
@@ -94,8 +94,8 @@
             <h6 class="card-subtitle mb-2 text-muted">
                 @Html.DisplayFor(m => status.Created)
             </h6>
-            <p class="card-text">
-                @Html.DisplayFor(m => status.ChangeAuthor.FullName): @Html.DisplayFor(m => status.Status).
+            <p class="card-text">                
+                @Html.DisplayFor(m => status.ChangeAuthor.FullName): <document-status status="@status.Status" />
                 Message: @Html.DisplayFor(m => status.Message)
             </p>
         </div>
