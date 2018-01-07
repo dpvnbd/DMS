@@ -24,15 +24,14 @@ namespace DMS.Infrastructure.Repositories
       _dbContext = context;
     }
 
-    public IQueryable<T> GetAll()
+    public virtual IQueryable<T> GetAll()
     {
       return _dbContext.Set<T>();
-    }
+    } 
 
     public async Task<T> GetById(int id)
     {
-      return await _dbContext.Set<T>()
-                .FirstOrDefaultAsync(e => e.Id == id);
+      return await GetAll().FirstOrDefaultAsync(t => t.Id == id);
     }
 
     public IQueryable<T> FindIncluding(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes)

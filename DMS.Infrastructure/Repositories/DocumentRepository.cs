@@ -15,9 +15,9 @@ namespace DMS.Infrastructure.Repositories
   {
     public DocumentRepository(AppDbContext context) : base(context)
     {
-    }
+    }  
 
-    public new IQueryable<Document> GetAll()
+    public override IQueryable<Document> GetAll()
     {
       return base.GetAll().Include(d => d.Author).Include(d => d.StatusChanges).ThenInclude(s => s.ChangeAuthor);
     }   

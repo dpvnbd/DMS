@@ -10,7 +10,7 @@ namespace DMS.Domain.Abstract
   public interface IRepository<T>
   {
     IQueryable<T> GetAll();
-
+    
     Task<T> GetById(int id);
 
     IQueryable<T> FindIncluding(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes);
