@@ -18,6 +18,20 @@ namespace DMS.Domain.Entities
     public string Title { get; protected set; }
     public string Body { get; protected set; }
 
+    public StatusChange LastStatusChange
+    {
+      get
+      {
+        if (!statusChanges.Any())
+        {
+          return null;
+        }
+        return statusChanges[statusChanges.Count - 1];
+      }
+    }
+
+    public DocumentStatus CurrentDocumentStatus => (DocumentStatus)LastStatusChange?.Status;
+
     //Empty constructor for EF
     protected Document() { }
 
@@ -42,19 +56,12 @@ namespace DMS.Domain.Entities
       statusChanges.Add(new StatusChange(author, DocumentStatus.Created, string.Empty, Created));
     }
 
-    public StatusChange GetLastStatusChange()
-    {
-      if (!statusChanges.Any())
-      {
-        return null;
-      }
-      return statusChanges[statusChanges.Count - 1];
-    }
+    
 
     public IEnumerable<DocumentStatus> AvailableStatusChanges(AppUser user)
     {
       var list = new List<DocumentStatus>();
-      var status = GetLastStatusChange().Status;
+      var status = LastStatusChange.Status;
       
       var isAuthor = user.Id == Author.Id;
       var isCustomer = user.Role == UserRole.Customer;
@@ -119,7 +126,7 @@ namespace DMS.Domain.Entities
         throw new ArgumentException("Only author or experts can edit the document", nameof(editAuthor));
       }
 
-      var lastStatus = GetLastStatusChange();
+      var lastStatus = LastStatusChange;
       if (lastStatus == null || lastStatus.Status == DocumentStatus.Created || lastStatus.Status == DocumentStatus.Rejected)
       {
         throw new InvalidOperationException("Only just created or rejected documents can be edited");
