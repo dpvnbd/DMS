@@ -12,14 +12,12 @@ namespace DMS.Web.Controllers
   {
     private readonly IRepository<Document> documentRepo;
 
-    public HomeController(IRepository<Document> documentRepo)
+    public HomeController()
     {
-      this.documentRepo = documentRepo;
     }
     public IActionResult Index()
     {
-      var documents = documentRepo.GetAll();
-      return View(documents);
+      return RedirectToAction("Index", "Document");
     }
   }
 }

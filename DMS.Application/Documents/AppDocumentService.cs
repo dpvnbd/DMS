@@ -57,5 +57,12 @@ namespace DMS.Application.Documents
       }
       return true;
     }
+
+    public IEnumerable<DocumentSummaryDto> FindDocuments(Func<Document, bool> predicate)
+    {
+      var documents = docRepo.GetAll().Where(predicate);
+      var summaries = mapper.Map<IEnumerable<DocumentSummaryDto>>(documents);
+      return summaries;
+    }
   }
 }

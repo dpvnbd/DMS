@@ -36,6 +36,17 @@ namespace DMS.Web.Controllers
     }
 
     [HttpGet]
+    public async Task<IActionResult> Index()
+    {
+      var documents =  documentService.FindDocuments(d => true);
+      if (documents == null)
+      {
+        return NotFound();
+      }
+      return View(documents);
+    }
+
+    [HttpGet]
     public async Task<IActionResult> Details(int id)
     {
       var userId = await GetDomainUserId();

@@ -1,0 +1,36 @@
+﻿@model IEnumerable<DMS.Application.DTOs.Documents.DocumentSummaryDto>
+
+@{
+    ViewData["Title"] = "All documents";
+}
+
+<h2>All documents</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <tbody>
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.Id">@item.Title</a>
+            </td>
+            <td>
+                <a asp-route-id="@item.AuthorId">@item.AuthorFullName</a>
+            </td>
+
+            <td>
+                <document-status status="@item.CurrentDocumentStatus"/>
+                @*@Html.DisplayFor(m => item.CurrentDocumentStatus)*@
+            </td>
+
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>

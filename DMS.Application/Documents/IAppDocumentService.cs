@@ -19,5 +19,7 @@ namespace DMS.Application.Documents
     Task<DocumentWithHistoryDto> GetDocument(int id, int userId);
 
     Task<bool> ChangeStatus(int documentId, int appUserId, DocumentStatus status, string message);
+
+    IEnumerable<DocumentSummaryDto> FindDocuments(Func<Document, bool> predicate);
   }
 }
