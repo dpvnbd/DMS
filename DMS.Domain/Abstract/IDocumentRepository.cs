@@ -15,9 +15,5 @@ namespace DMS.Domain.Abstract
   public interface IDocumentRepository : IRepository<Document>
   {
     new IQueryable<Document> GetAll();
-
-    IQueryable<Document> FindBy(Expression<Func<Document, bool>> predicate);
-
-    new Task<Document> GetById(int id);   
   }
 }
