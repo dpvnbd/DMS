@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using DMS.Application.Authentication;
 using DMS.Application.Documents;
+using DMS.Application.Infrastructure;
 using DMS.Application.Users;
 using DMS.Domain.Abstract;
 using DMS.Infrastructure;
@@ -62,7 +63,7 @@ namespace DMS.Web
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-    public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+    public async void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider)
     {
       if (env.IsDevelopment())
       {
@@ -70,6 +71,8 @@ namespace DMS.Web
       }
 
       app.UseAuthentication();
+      await IdentityRolesSetup.CreateRoles(serviceProvider);
+      
       app.UseStaticFiles();
       app.UseMvcWithDefaultRoute();
     }
