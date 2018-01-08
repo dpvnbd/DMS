@@ -11,52 +11,55 @@ namespace DMS.Application.Infrastructure
 {
   public static class IdentityRolesSetup
   {
-    public static async Task CreateRoles(IServiceProvider serviceProvider)
+    public static void CreateRoles(IServiceProvider serviceProvider)
     {
-      //initializing custom roles 
-      var RoleManager = serviceProvider.GetRequiredService<RoleManager<AppIdentityRole>>();
-      var UserManager = serviceProvider.GetRequiredService<UserManager<AppIdentityUser>>();
-      string[] roleNames = { "Admin", "Moderator", "Default" };
-      IdentityResult roleResult;
-
-      foreach (var roleName in roleNames)
+      using (var scope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope())
       {
-        var roleExist = await RoleManager.RoleExistsAsync(roleName);
-        // ensure that the role does not exist
-        if (!roleExist)
+
+        //initializing custom roles 
+        var RoleManager = scope.ServiceProvider.GetRequiredService<RoleManager<AppIdentityRole>>();
+        var UserManager = scope.ServiceProvider.GetRequiredService<UserManager<AppIdentityUser>>();
+        string[] roleNames = { "Admin", "Moderator", "Default" };
+        IdentityResult roleResult;
+
+        foreach (var roleName in roleNames)
         {
-          //create the roles and seed them to the database: 
-          roleResult = await RoleManager.CreateAsync(new AppIdentityRole(roleName));
+          var roleExist = RoleManager.RoleExistsAsync(roleName).Result;
+          // ensure that the role does not exist
+          if (!roleExist)
+          {
+            //create the roles and seed them to the database: 
+            roleResult = RoleManager.CreateAsync(new AppIdentityRole(roleName)).Result;
+          }
         }
-      }
 
-      // find the user with the admin email 
-      var _user = await UserManager.FindByNameAsync("admin");
+        // find the user with the admin email 
+        var _user = UserManager.FindByNameAsync("admin").Result;
 
-      // check if the user exists
-      if (_user == null)
-      {
-
-        //Here you could create the super admin who will maintain the web app
-
-        var domainUser = new AppUser("Admin", "Admin", UserRole.Expert);
-
-        var poweruser = new AppIdentityUser
+        // check if the user exists
+        if (_user == null)
         {
-          UserName = "admin",
-          Email = "admin@email.com",
-          AppUser = domainUser
-        };
-        string adminPassword = "DefaultAdminPassword";
 
-        var createPowerUser = await UserManager.CreateAsync(poweruser, adminPassword);
-        if (createPowerUser.Succeeded)
-        {
-          //here we tie the new user to the role
-          await UserManager.AddToRoleAsync(poweruser, "Admin");
+          //Here you could create the super admin who will maintain the web app
+
+          var domainUser = new AppUser("Admin", "Admin", UserRole.Expert);
+
+          var poweruser = new AppIdentityUser
+          {
+            UserName = "admin",
+            Email = "admin@email.com",
+            AppUser = domainUser
+          };
+          string adminPassword = "DefaultAdminPassword";
+
+          var createPowerUser = UserManager.CreateAsync(poweruser, adminPassword).Result;
+          if (createPowerUser.Succeeded)
+          {
+            //here we tie the new user to the role
+            UserManager.AddToRoleAsync(poweruser, "Admin");
+          }
         }
       }
     }
-  }
   }
 }

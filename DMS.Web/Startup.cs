@@ -63,7 +63,7 @@ namespace DMS.Web
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-    public async void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider)
+    public void Configure(IApplicationBuilder app, IHostingEnvironment env)
     {
       if (env.IsDevelopment())
       {
@@ -71,7 +71,7 @@ namespace DMS.Web
       }
 
       app.UseAuthentication();
-      await IdentityRolesSetup.CreateRoles(serviceProvider);
+      IdentityRolesSetup.CreateRoles(app.ApplicationServices);
       
       app.UseStaticFiles();
       app.UseMvcWithDefaultRoute();
