@@ -6,14 +6,16 @@ using System.Threading.Tasks;
 
 namespace DMS.Web.Models.Document
 {
-  public class CreateDocumentViewModel
+  public class DocumentEditingViewModel
   {
+    public int Id { get; set; }
+
     [Required]
     [StringLength(30, MinimumLength = 1)]
     public string Title { get; set; }
 
     [Required]
-    [StringLength(256, MinimumLength = 1)]
+    [StringLength(1023, MinimumLength = 3)]
     public string Body { get; set; }
   }
 }

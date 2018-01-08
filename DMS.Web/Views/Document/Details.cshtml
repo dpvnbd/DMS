@@ -22,7 +22,7 @@
             @Html.DisplayFor(model => d.Body)
         </p>
         <a href="#" class="card-link">
-            @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ })
+            @Html.ActionLink("Edit", "Edit", new {  id = d.Id })
         </a>
         <a asp-action="Index" class="card-link">Back to List</a>
     </div>

@@ -38,7 +38,7 @@ namespace DMS.Web.Controllers
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-      var documents =  documentService.FindDocuments(d => true);
+      var documents = documentService.FindDocuments(d => true);
       if (documents == null)
       {
         return NotFound();
@@ -50,7 +50,7 @@ namespace DMS.Web.Controllers
     public async Task<IActionResult> Details(int id)
     {
       var userId = await GetDomainUserId();
-      var document = await documentService.GetDocument(id, userId);
+      var document = await documentService.GetFullDocument(id, userId);
       if (document == null)
       {
         return NotFound();
@@ -62,12 +62,30 @@ namespace DMS.Web.Controllers
     [HttpGet]
     public IActionResult Create()
     {
-      return View();
+      ViewData["Title"] = "Create document";
+      ViewData["Action"] = "Create";
+      return View("Edit", new DocumentEditingViewModel());
+    }
+
+
+    [HttpGet]
+    public async Task<IActionResult> Edit(int id)
+    {
+      ViewData["Title"] = "Edit document";
+      ViewData["Action"] = "Edit";
+      var documentDto = await documentService.GetDocumentContents(id);
+      var document = mapper.Map<DocumentEditingViewModel>(documentDto);
+      if(document == null)
+      {
+        return NotFound();
+      }
+
+      return View("Edit", document);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(CreateDocumentViewModel model)
+    public async Task<IActionResult> CreateEdit(DocumentEditingViewModel model)
     {
       if (!ModelState.IsValid)
       {
@@ -78,9 +96,17 @@ namespace DMS.Web.Controllers
 
       var documentDto = mapper.Map<DocumentContentsDto>(model);
       documentDto.AuthorId = userId;
-      await documentService.CreateDocument(documentDto);
+      int id;
+      if (model.Id != 0)
+      {
+        id = await documentService.EditDocument(documentDto);
+      }
+      else
+      {
+        id = await documentService.CreateDocument(documentDto);
+      }
 
-      return RedirectToAction("Index", "Home");
+      return RedirectToAction("Details", "Document", new { id });
     }
 
     /// <summary>

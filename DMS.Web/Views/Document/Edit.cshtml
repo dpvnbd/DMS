@@ -1,16 +1,18 @@
-﻿@model DMS.Web.Models.Document.CreateDocumentViewModel
+﻿@model DMS.Web.Models.Document.DocumentEditingViewModel
 
 @{
-    ViewData["Title"] = "Create document";
+  var title = (string)ViewData["Title"];
+  var action = (string)ViewData["Action"];
 }
 
-<h2>Create Document</h2>
+<h2>@title</h2>
 
 <hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
+    <div class="col-md-10">
+        <form asp-action="CreateEdit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @Html.HiddenFor(m => m.Id)
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
                 <input asp-for="Title" class="form-control" />
@@ -18,17 +20,12 @@
             </div>
             <div class="form-group">
                 <label asp-for="Body" class="control-label"></label>
-                <input asp-for="Body" class="form-control" />
+                <textarea rows="10" asp-for="Body" class="form-control"></textarea>
                 <span asp-validation-for="Body" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-default" />
+                <input type="submit" value="@action" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
-
-<div>
-    <a asp-action="Index" asp-controller="Home">Back to List</a>
-</div>
-

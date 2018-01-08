@@ -32,12 +32,34 @@ namespace DMS.Application.Documents
       return document.Id;
     }
 
-    public async Task<DocumentWithHistoryDto> GetDocument(int documentId, int userId)
+    public async Task<int> EditDocument(DocumentContentsDto d)
+    {
+      try
+      {
+        var editor = await userRepo.GetById(d.AuthorId);
+        var document = await docRepo.GetById(d.Id);
+        document.Edit(editor, d.Title, d.Body);
+        await docRepo.Update(document);
+      }catch(Exception e)
+      {
+        // Log
+      }
+      return d.Id;
+    }
+
+    public async Task<DocumentWithHistoryDto> GetFullDocument(int documentId, int userId)
     {
       var document = await docRepo.GetById(documentId);
       var user = await userRepo.GetById(userId);
       var dto = mapper.Map<DocumentWithHistoryDto>(document);
       dto.AvailableStatusChanges = document?.AvailableStatusChanges(user);
+      return dto;
+    }
+
+    public async Task<DocumentContentsDto> GetDocumentContents(int id)
+    {
+      var document = await docRepo.GetById(id);
+      var dto = mapper.Map<DocumentContentsDto>(document);
       return dto;
     }
 
@@ -63,6 +85,6 @@ namespace DMS.Application.Documents
       var documents = docRepo.GetAll().Where(predicate);
       var summaries = mapper.Map<IEnumerable<DocumentSummaryDto>>(documents);
       return summaries;
-    }
+    }   
   }
 }

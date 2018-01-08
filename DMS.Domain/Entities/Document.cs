@@ -54,9 +54,7 @@ namespace DMS.Domain.Entities
       Modified = Created;
 
       statusChanges.Add(new StatusChange(author, DocumentStatus.Created, string.Empty, Created));
-    }
-
-    
+    }    
 
     public IEnumerable<DocumentStatus> AvailableStatusChanges(AppUser user)
     {
@@ -108,9 +106,29 @@ namespace DMS.Domain.Entities
       statusChanges.Add(new StatusChange(changeAuthor, newStatus, message, DateTime.Now));
     }
 
-
-    public void EditDocument(AppUser editAuthor, string title, string body)
+    public bool CanEdit(AppUser user)
     {
+      var currentStatus = CurrentDocumentStatus;
+      // Author can edit his document before submition
+      if (user.Id == Author.Id &&
+        (currentStatus == DocumentStatus.Created || currentStatus == DocumentStatus.Rejected))
+      {
+        return true;
+      }
+
+      // Experts can always edit the document
+      return user.Role == UserRole.Expert;
+    }
+
+    public void Edit(AppUser editAuthor, string title, string body)
+    {
+      var canEdit = CanEdit(editAuthor);
+
+      if (!canEdit)
+      {
+        throw new InvalidOperationException("The document can be edited only by Expert or by Author before submition");
+      }
+
       if (string.IsNullOrWhiteSpace(title))
       {
         throw new ArgumentException("Title can't be empty", nameof(title));
@@ -119,18 +137,7 @@ namespace DMS.Domain.Entities
       if (string.IsNullOrWhiteSpace(body))
       {
         throw new ArgumentException("Body can't be empty", nameof(body));
-      }
-
-      if (editAuthor.Id != Author.Id && editAuthor.Role != UserRole.Expert)
-      {
-        throw new ArgumentException("Only author or experts can edit the document", nameof(editAuthor));
-      }
-
-      var lastStatus = LastStatusChange;
-      if (lastStatus == null || lastStatus.Status == DocumentStatus.Created || lastStatus.Status == DocumentStatus.Rejected)
-      {
-        throw new InvalidOperationException("Only just created or rejected documents can be edited");
-      }
+      }          
 
       Title = title;
       Body = body;

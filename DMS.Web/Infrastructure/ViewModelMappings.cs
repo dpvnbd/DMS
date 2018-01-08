@@ -16,7 +16,7 @@ namespace DMS.Web.Infrastructure
     {
       CreateMap<RegisterViewModel, RegisterDto>();
       CreateMap<LoginViewModel, LoginDto>();
-      CreateMap<CreateDocumentViewModel, DocumentContentsDto>();
+      CreateMap<DocumentEditingViewModel, DocumentContentsDto>().ReverseMap();
     }
   }
 }

@@ -14,12 +14,18 @@ namespace DMS.Application.Documents
     /// </summary>
     /// <param name="document">Contents of the new document</param>
     /// <returns>Id of the new document</returns>
+    
     Task<int> CreateDocument(DocumentContentsDto document);
 
-    Task<DocumentWithHistoryDto> GetDocument(int id, int userId);
+    Task<int> EditDocument(DocumentContentsDto document);
+
+    Task<DocumentWithHistoryDto> GetFullDocument(int id, int userId);
+
+    Task<DocumentContentsDto> GetDocumentContents(int id);
 
     Task<bool> ChangeStatus(int documentId, int appUserId, DocumentStatus status, string message);
 
     IEnumerable<DocumentSummaryDto> FindDocuments(Func<Document, bool> predicate);
+    
   }
 }
