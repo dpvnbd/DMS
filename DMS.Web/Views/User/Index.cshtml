@@ -1,0 +1,23 @@
+﻿@model IEnumerable<DMS.Application.DTOs.Users.UserSummaryDto>
+
+@{
+    ViewData["Title"] = "All users";
+}
+
+<h2>All users</h2>
+
+</p>
+<table class="table">
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <a asp-action="Details" asp-controller="User" asp-route-id="@item.Id">
+                        <user-badge user="@item" />
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

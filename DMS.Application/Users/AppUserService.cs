@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,13 @@ namespace DMS.Application.Users
     {
       this.userRepo = userRepo;
       this.mapper = mapper;
+    }
+
+    public IEnumerable<UserSummaryDto> FindUsers(Func<AppUser, bool> predicate)
+    {
+      var users = userRepo.GetAll().Where(predicate);
+      var summaries = mapper.Map<IEnumerable<UserSummaryDto>>(users);
+      return summaries;
     }
 
     public async Task<UserFullDto> GetUser(int id)
