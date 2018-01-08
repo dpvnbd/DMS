@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DMS.Web.TagHelpers
 {
-  public class DocumentStatusTagHelper : TagHelper
+  public class DocumentStatusBadgeTagHelper : TagHelper
   {
     public DocumentStatus Status { get; set; }
     public override void Process(TagHelperContext context, TagHelperOutput output)

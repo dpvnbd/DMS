@@ -7,5 +7,8 @@ namespace DMS.Infrastructure.Data.Identity
 {
   public class AppIdentityRole : IdentityRole
   {
+    public AppIdentityRole(string roleName) : base(roleName)
+    {
+    }
   }
 }

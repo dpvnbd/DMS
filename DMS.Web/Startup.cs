@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using DMS.Application.Authentication;
 using DMS.Application.Documents;
+using DMS.Application.Users;
 using DMS.Domain.Abstract;
 using DMS.Infrastructure;
 using DMS.Infrastructure.Data;
@@ -50,8 +51,10 @@ namespace DMS.Web
 
       services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
       services.AddScoped<IDocumentRepository, DocumentRepository>();
+
       services.AddScoped<IAuthService, AuthService>();
       services.AddScoped<IAppDocumentService, AppDocumentService>();
+      services.AddScoped<IAppUserService, AppUserService>();
 
       services.AddAutoMapper();
 

@@ -18,12 +18,14 @@
                 <a asp-action="Details" asp-route-id="@item.Id">@item.Title</a>
             </td>
             <td>
-                <a asp-route-id="@item.AuthorId">@item.AuthorFullName</a>
+                <a asp-action="Details" asp-controller="User" asp-route-id="@item.Author.Id">
+                    <user-badge user="@item.Author" />
+                </a>
             </td>
 
             <td>
-                <document-status status="@item.CurrentDocumentStatus"/>
-                @*@Html.DisplayFor(m => item.CurrentDocumentStatus)*@
+                <document-status-badge status="@item.CurrentDocumentStatus"/>               
+
             </td>
 
             <td>
