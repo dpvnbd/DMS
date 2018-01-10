@@ -9,6 +9,7 @@ using DMS.Domain.Abstract;
 using DMS.Domain.Entities;
 using DMS.Infrastructure.Data.Identity;
 using DMS.Web.Models.Account;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -78,9 +79,37 @@ namespace DMS.Web.Controllers
       return View(model);
     }
 
+    [Authorize]
     public async Task<IActionResult> Logout()
     {
       await authService.Logout();
+      return RedirectToAction("Index", "Home");
+    }
+
+    [Authorize]
+    [HttpGet]
+    public IActionResult ChangePassword()
+    {
+      return View();
+    }
+
+    [Authorize]
+    [HttpPost]
+    public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+    {
+      if (!ModelState.IsValid)
+      {
+        return View(model);
+      }
+
+      var success = await authService.ChangePassword(User, model.OldPassword, model.NewPassword);
+
+      if (!success)
+      {
+        ModelState.AddModelError(string.Empty, "Unable to change password");
+        return View(model);
+      }
+
       return RedirectToAction("Index", "Home");
     }
   }
