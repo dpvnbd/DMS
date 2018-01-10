@@ -6,6 +6,11 @@
 
 
 <div>
+    @if (User.IsInRole("Admin"))
+    {
+        <hr />
+        <a asp-action="Identity" asp-route-id="@Model.Id">Manage user</a>
+    }
     <hr />
     <dl class="dl-horizontal">
         <dt>
