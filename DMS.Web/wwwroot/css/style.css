@@ -1,2 +1,7 @@
 ﻿body {
 }
+
+.dropdown-menu > a:hover {
+    background-color: bisque;
+    background-image: none;
+}

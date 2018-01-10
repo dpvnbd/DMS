@@ -1,5 +1,13 @@
 ﻿@using System.Security.Principal
+@using Microsoft.AspNetCore.Identity
+@using DMS.Infrastructure.Data.Identity
+@using DMS.Application.DTOs.Users
+@using DMS.Application.Authentication
+@inject IAuthService authService
 
+@{ 
+  var user = await authService.GetUserByClaims(User);
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,23 +35,45 @@
             <span class="navbar-toggler-icon"></span>
         </button>
 
+
+
         <div class="collapse navbar-collapse" id="mainNavbar">
-            <div class="navbar-nav mr-auto">
-                <a class="nav-item nav-link" asp-action="Index" asp-controller="Document">Documents</a>
-                <a class="nav-item nav-link" asp-action="Index" asp-controller="User">Users</a>
-            </div>
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-item nav-link" asp-action="Index" asp-controller="Document">Documents</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-item nav-link" asp-action="Index" asp-controller="User">Users</a>
+                </li>                
+            </ul>
 
-            @if (User.Identity.IsAuthenticated)
-            {
-                <span class="navbar-text">Welcome, @User.Identity.Name</span>                
-                <a asp-controller="Account" asp-action="Logout" class="nav-link">Logout</a>
+            <ul class="navbar-nav">
+                @if (User.Identity.IsAuthenticated && user != null)
+                {
+                    <li class="nav-item dropdown dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownAccount" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <user-badge user="@user"/>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+                            <a asp-controller="User" asp-action="Details" asp-route-id="@user.Id" class="dropdown-item">Profile</a>
+                            <a asp-controller="Account" asp-action="ChangePassword" class="dropdown-item">Change password</a>
 
-            }
-            else
-            {
-                <a asp-controller="Account" asp-action="Login" class="nav-link">Login</a>
-                <a asp-controller="Account" asp-action="Register" class="nav-link">Register</a>
-            }
+                            <a asp-controller="Account" asp-action="Logout" class="dropdown-item">Logout</a>
+
+                        </div>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a asp-controller="Account" asp-action="Login" class="nav-link">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a asp-controller="Account" asp-action="Register" class="nav-link">Register</a>
+                    </li>
+
+                }
+            </ul>
         </div>
     </nav>
 
