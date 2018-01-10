@@ -1,4 +1,5 @@
-﻿using DMS.Domain.Entities;
+﻿using DMS.Application.Authentication;
+using DMS.Domain.Entities;
 using DMS.Infrastructure.Data.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +20,11 @@ namespace DMS.Application.Infrastructure
         //initializing custom roles 
         var RoleManager = scope.ServiceProvider.GetRequiredService<RoleManager<AppIdentityRole>>();
         var UserManager = scope.ServiceProvider.GetRequiredService<UserManager<AppIdentityUser>>();
-        string[] roleNames = { "Admin", "Moderator", "Default" };
+        var roleNames = new List<string>();
+        foreach(var role in Enum.GetValues(typeof(AppUserIdentityRoleEnum)))
+        {
+          roleNames.Add(role.ToString());
+        }
         IdentityResult roleResult;
 
         foreach (var roleName in roleNames)
@@ -39,7 +44,6 @@ namespace DMS.Application.Infrastructure
         // check if the user exists
         if (_user == null)
         {
-
           //Here you could create the super admin who will maintain the web app
 
           var domainUser = new AppUser("Admin", "Admin", UserRole.Expert);
@@ -56,7 +60,7 @@ namespace DMS.Application.Infrastructure
           if (createPowerUser.Succeeded)
           {
             //here we tie the new user to the role
-            UserManager.AddToRoleAsync(poweruser, "Admin");
+            UserManager.AddToRoleAsync(poweruser, AppUserIdentityRoleEnum.Admin.ToString());
           }
         }
       }

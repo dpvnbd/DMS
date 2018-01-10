@@ -6,6 +6,7 @@ using DMS.Domain.Entities;
 using DMS.Infrastructure.Data.Identity;
 using Microsoft.AspNetCore.Identity;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text;
@@ -96,5 +97,41 @@ namespace DMS.Application.Authentication
 
       return identityUser?.AppUserId ?? -1;
     }
-  }
+
+    public async Task<bool> SetUserIdentityRole(string userId, AppUserIdentityRoleEnum role)
+    {
+      var user = await userManager.FindByIdAsync(userId);
+      if(user == null)
+      {
+        return false;
+      }
+
+      if(user.UserName.Equals("admin", StringComparison.OrdinalIgnoreCase))
+      {
+        return false; // keep at least one admin
+      }
+
+      var roles = await userManager.GetRolesAsync(user);
+      await userManager.RemoveFromRolesAsync(user, roles);
+
+      var result = await userManager.AddToRoleAsync(user, role.ToString());
+
+      return result.Succeeded;
+    }
+
+    public async Task<UserIdentityDto> GetUserIdentity(int id)
+    {
+      var user = userManager.Users.FirstOrDefault(i => i.AppUserId == id);
+      if (user == null)
+      {
+        return null;
+      }
+      user.AppUser = await userRepo.GetById(user.AppUserId);
+      
+      var dto = mapper.Map<UserIdentityDto>(user);
+
+      dto.IdentityRoles = await userManager.GetRolesAsync(user);
+      return dto;
+    }
+  }  
 }

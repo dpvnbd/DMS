@@ -34,5 +34,25 @@ namespace DMS.Application.Users
       var dto = mapper.Map<UserFullDto>(user);
       return dto;
     }
+
+    public async Task<bool> SetRole(int userId, UserRole role)
+    {
+      var user = await userRepo.GetById(userId);
+      if (user == null)
+      {
+        return false;
+      }
+
+      try
+      {
+        user.SetRole(role);
+        await userRepo.Update(user);
+      }
+      catch (Exception)
+      {
+        return false;
+      }
+      return true;
+    }
   }
 }

@@ -1,0 +1,67 @@
+﻿@using DMS.Application.DTOs.Users
+@using DMS.Web.Models.Account
+@using DMS.Domain.Entities
+@using DMS.Application.Authentication
+
+@model UserRolesViewModel
+
+@{
+  var user = (UserIdentityDto)ViewData["User"];
+  ViewData["Title"] = user.UserName;
+}
+
+<div>
+    <dl class="">
+        <dt>
+            Profile:
+        </dt>
+        <dd>
+            <a asp-action="Details" asp-all-route-id="@user.Id"><user-badge user="@user.AppUser" /></a>
+        </dd>
+        <dt>
+            Username:
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => user.UserName)
+        </dd>
+        <dt>
+            Email:
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => user.Email)
+        </dd>
+
+        <dt>
+            Reviewer role:
+        </dt>
+        <dd>
+            @user.AppUser.Role.ToString()
+        </dd>
+
+        <dt>
+            Administration role:
+        </dt>
+        <dd>
+            @user.IdentityRoles.FirstOrDefault()
+        </dd>
+    </dl>
+</div>
+<hr/>
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    @Html.Hidden("IdentityId", user.Id)
+    @Html.Hidden("Id", user.AppUser.Id)
+    <div class="form-group">
+        <label asp-for="UserRole" class="control-label"></label>
+        <select asp-for="UserRole" asp-items="Html.GetEnumSelectList<UserRole>()" class="form-control"></select>
+        <span asp-validation-for="UserRole" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="IdentityRole" class="control-label"></label>
+        <select asp-for="IdentityRole" asp-items="Html.GetEnumSelectList<AppUserIdentityRoleEnum>()" class="form-control"></select>
+
+        <span asp-validation-for="IdentityRole" class="text-danger"></span>
+    </div>
+    <input asp-action="SetRoles" type="submit" value="Set roles" class="btn btn-success"/>
+</form>

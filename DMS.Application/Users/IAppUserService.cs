@@ -12,5 +12,7 @@ namespace DMS.Application.Users
     Task<UserFullDto> GetUser(int id);
 
     IEnumerable<UserSummaryDto> FindUsers(Func<AppUser, bool> predicate);
+
+    Task<bool> SetRole(int userId, UserRole role);   
   }
 }

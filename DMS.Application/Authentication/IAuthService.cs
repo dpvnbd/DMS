@@ -16,5 +16,9 @@ namespace DMS.Application.Authentication
     Task<int> GetUserIdByClaims(ClaimsPrincipal user);
 
     Task<UserSummaryDto> GetUserByClaims(ClaimsPrincipal user);
+
+    Task<bool> SetUserIdentityRole(string userId, AppUserIdentityRoleEnum role);
+
+    Task<UserIdentityDto> GetUserIdentity(int id);
   }
 }

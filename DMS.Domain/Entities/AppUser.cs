@@ -30,5 +30,10 @@ namespace DMS.Domain.Entities
       LastName = lastName;
       Role = role;
     }
+
+    public void SetRole(UserRole role)
+    {
+      Role = role;
+    }
   }
 }
