@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using DMS.Application.Authentication;
 using DMS.Application.Documents;
 using DMS.Application.DTOs.Documents;
 using DMS.Domain.Abstract;
@@ -20,21 +21,18 @@ namespace DMS.Web.Controllers
   {
     private readonly UserManager<AppIdentityUser> userManager;
     private readonly IAppDocumentService documentService;
+    private readonly IAuthService authService;
     private readonly IMapper mapper;
 
-    public DocumentController(UserManager<AppIdentityUser> userManager, IAppDocumentService documentService, IMapper mapper)
+    public DocumentController(UserManager<AppIdentityUser> userManager, IAppDocumentService documentService,
+      IAuthService authService, IMapper mapper)
     {
       this.userManager = userManager;
       this.documentService = documentService;
+      this.authService = authService;
       this.mapper = mapper;
     }
-
-    private async Task<int> GetDomainUserId()
-    {
-      var identityUser = await userManager.GetUserAsync(HttpContext.User);
-      return identityUser.AppUserId;
-    }
-
+    
     [HttpGet]
     public async Task<IActionResult> Index()
     {
@@ -49,7 +47,7 @@ namespace DMS.Web.Controllers
     [HttpGet]
     public async Task<IActionResult> Details(int id)
     {
-      var userId = await GetDomainUserId();
+      var userId = await authService.GetUserIdByClaims(User);
       var document = await documentService.GetFullDocument(id, userId);
       if (document == null)
       {
@@ -92,7 +90,7 @@ namespace DMS.Web.Controllers
         return View(model);
       }
 
-      var userId = await GetDomainUserId();
+      var userId = await authService.GetUserIdByClaims(User);
 
       var documentDto = mapper.Map<DocumentContentsDto>(model);
       documentDto.AuthorId = userId;
@@ -121,7 +119,7 @@ namespace DMS.Web.Controllers
         return View("Details", model);
       }
 
-      var userId = await GetDomainUserId();
+      var userId = await authService.GetUserIdByClaims(User);
 
       var success = await documentService.ChangeStatus(model.DocumentId, userId, status, model.Message);
 

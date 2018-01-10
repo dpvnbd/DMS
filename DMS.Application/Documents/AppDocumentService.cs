@@ -13,11 +13,11 @@ namespace DMS.Application.Documents
 {
   public class AppDocumentService : IAppDocumentService
   {
-    private readonly IDocumentRepository docRepo;
+    private readonly IRepository<Document> docRepo;
     private readonly IRepository<AppUser> userRepo;
     private readonly IMapper mapper;
 
-    public AppDocumentService(IDocumentRepository docRepo, IRepository<AppUser> userRepo, IMapper mapper)
+    public AppDocumentService(IRepository<Document> docRepo, IRepository<AppUser> userRepo, IMapper mapper)
     {
       this.docRepo = docRepo;
       this.userRepo = userRepo;

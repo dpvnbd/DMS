@@ -1,12 +1,9 @@
-﻿@using System.Security.Principal
-@using Microsoft.AspNetCore.Identity
-@using DMS.Infrastructure.Data.Identity
+﻿@using DMS.Application.Authentication
 @using DMS.Application.DTOs.Users
-@using DMS.Application.Authentication
 @inject IAuthService authService
 
 @{ 
-  var user = await authService.GetUserByClaims(User);
+  UserSummaryDto user = authService.GetUserByClaims(User).Result;
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -48,7 +45,7 @@
             </ul>
 
             <ul class="navbar-nav">
-                @if (User.Identity.IsAuthenticated && user != null)
+                @if (User.Identity.IsAuthenticated)
                 {
                     <li class="nav-item dropdown dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownAccount" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

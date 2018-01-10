@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace DMS.Domain.Abstract
 {
+ 
   public interface IRepository<T>
   {
     IQueryable<T> GetAll();

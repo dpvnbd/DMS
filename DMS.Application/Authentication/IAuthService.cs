@@ -13,7 +13,8 @@ namespace DMS.Application.Authentication
     Task Logout();
     Task<bool> ChangePassword(ClaimsPrincipal user, string oldPassword, string newPassword);
 
-    Task<UserSummaryDto> GetUserByClaims(ClaimsPrincipal user);
+    Task<int> GetUserIdByClaims(ClaimsPrincipal user);
 
+    Task<UserSummaryDto> GetUserByClaims(ClaimsPrincipal user);
   }
 }

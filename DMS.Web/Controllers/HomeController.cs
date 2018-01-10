@@ -10,8 +10,6 @@ namespace DMS.Web.Controllers
 {
   public class HomeController : Controller
   {
-    private readonly IRepository<Document> documentRepo;
-
     public HomeController()
     {
     }

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace DMS.Infrastructure.Repositories
 {
-  public class DocumentRepository : Repository<Document>,  IDocumentRepository
+  public class DocumentRepository : Repository<Document>
   {
     public DocumentRepository(AppDbContext context) : base(context)
     {

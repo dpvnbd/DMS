@@ -8,6 +8,7 @@ using DMS.Application.Documents;
 using DMS.Application.Infrastructure;
 using DMS.Application.Users;
 using DMS.Domain.Abstract;
+using DMS.Domain.Entities;
 using DMS.Infrastructure;
 using DMS.Infrastructure.Data;
 using DMS.Infrastructure.Data.Identity;
@@ -51,7 +52,7 @@ namespace DMS.Web
         .AddDefaultTokenProviders();
 
       services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-      services.AddScoped<IDocumentRepository, DocumentRepository>();
+      services.AddScoped<IRepository<Document>, DocumentRepository>();
 
       services.AddScoped<IAuthService, AuthService>();
       services.AddScoped<IAppDocumentService, AppDocumentService>();

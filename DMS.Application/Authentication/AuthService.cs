@@ -18,6 +18,7 @@ namespace DMS.Application.Authentication
     private SignInManager<AppIdentityUser> signInManager;
     private UserManager<AppIdentityUser> userManager;
     private IRepository<AppUser> userRepo;
+    private readonly IRepository<AppIdentityUser> identityRepo;
     private readonly IMapper mapper;
 
     public AuthService(SignInManager<AppIdentityUser> signInManager, UserManager<AppIdentityUser> userManager,
@@ -67,7 +68,7 @@ namespace DMS.Application.Authentication
     public async Task<bool> ChangePassword(ClaimsPrincipal user, string oldPassword, string newPassword)
     {
       var identityUser = await userManager.GetUserAsync(user);
-      if(identityUser == null)
+      if (identityUser == null)
       {
         return false;
       }
@@ -76,11 +77,24 @@ namespace DMS.Application.Authentication
       return result.Succeeded;
     }
 
-    public async Task<UserSummaryDto> GetUserByClaims(ClaimsPrincipal user)
+    public async Task<UserSummaryDto> GetUserByClaims(ClaimsPrincipal userClaim)
     {
-      var identityUser = await userManager.GetUserAsync(user);
-      var dto = mapper.Map<UserSummaryDto>(identityUser.AppUser);
+      var userId = await GetUserIdByClaims(userClaim);
+      var user = await userRepo.GetById(userId);
+      var dto = mapper.Map<UserSummaryDto>(user);
       return dto;
+    }
+
+    public async Task<int> GetUserIdByClaims(ClaimsPrincipal userClaim)
+    {
+      if (userClaim == null)
+      {
+        return -1;
+      }
+
+      var identityUser = await userManager.GetUserAsync(userClaim);
+
+      return identityUser?.AppUserId ?? -1;
     }
   }
 }

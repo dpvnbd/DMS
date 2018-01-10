@@ -10,6 +10,11 @@ using System.Threading.Tasks;
 
 namespace DMS.Infrastructure.Repositories
 {
+  /// <summary>
+  /// Generic repository. In most cases entities won't have their navigational properties loaded.
+  /// To fix that, override GetAll() method to include the properties of needed type or use the method FindIncluding
+  /// </summary>
+  /// <typeparam name="T"></typeparam>
   public class Repository<T> : IRepository<T> where T : BaseEntity
   {
     private readonly DbContext _dbContext;
