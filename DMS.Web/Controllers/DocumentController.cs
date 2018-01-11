@@ -88,7 +88,7 @@ namespace DMS.Web.Controllers
     {
       if (!ModelState.IsValid)
       {
-        return View(model);
+        return View("Edit", model);
       }
 
       var userId = await authService.GetUserIdByClaims(User);
