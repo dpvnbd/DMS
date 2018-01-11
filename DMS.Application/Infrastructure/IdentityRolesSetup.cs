@@ -60,7 +60,7 @@ namespace DMS.Application.Infrastructure
           if (createPowerUser.Succeeded)
           {
             //here we tie the new user to the role
-            UserManager.AddToRoleAsync(poweruser, AppUserIdentityRoleEnum.Admin.ToString());
+            UserManager.AddToRoleAsync(poweruser, AppUserIdentityRoleEnum.Admin.ToString()).RunSynchronously();
           }
         }
       }
