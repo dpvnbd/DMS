@@ -112,5 +112,23 @@ namespace DMS.Application.Documents
       }
       return mapper.Map<IEnumerable<DocumentSummaryDto>>(documents);
     }
+
+    public async Task<bool> Delete(int documentId)
+    {
+      var document = await docRepo.GetById(documentId);
+      if(document == null)
+      {
+        return false;
+      }
+      try
+      {
+        await docRepo.Delete(documentId);
+      }
+      catch (Exception)
+      {
+        return false;
+      }
+      return true;
+    }
   }
 }

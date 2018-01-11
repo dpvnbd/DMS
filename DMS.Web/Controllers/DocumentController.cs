@@ -32,7 +32,7 @@ namespace DMS.Web.Controllers
       this.authService = authService;
       this.mapper = mapper;
     }
-    
+
     [HttpGet]
     public async Task<IActionResult> Index()
     {
@@ -74,7 +74,7 @@ namespace DMS.Web.Controllers
       ViewData["Action"] = "Edit";
       var documentDto = await documentService.GetDocumentContents(id);
       var document = mapper.Map<DocumentEditingViewModel>(documentDto);
-      if(document == null)
+      if (document == null)
       {
         return NotFound();
       }
@@ -160,6 +160,32 @@ namespace DMS.Web.Controllers
     public async Task<IActionResult> Accept(SubmitStatusChangeViewModel model)
     {
       return await ChangeStatus(DocumentStatus.Accepted, model);
+    }
+
+    [HttpGet]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Delete(int id)
+    {
+      var documents = await documentService.FindDocuments(d => d.Id == id);
+      var document = documents.FirstOrDefault();
+      if (document == null)
+      {
+        return NotFound();
+      }
+      return View(document);
+    }
+
+    [ActionName("Delete")]
+    [HttpPost]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> DeleteDocument(int id)
+    {
+      var success = await documentService.Delete(id);
+      if (!success)
+      {
+        return RedirectToAction("Details", new {  id })
+;     }
+      return RedirectToAction("Index");
     }
   }
 }
