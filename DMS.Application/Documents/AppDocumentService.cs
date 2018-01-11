@@ -40,19 +40,31 @@ namespace DMS.Application.Documents
         var document = await docRepo.GetById(d.Id);
         document.Edit(editor, d.Title, d.Body);
         await docRepo.Update(document);
-      }catch(Exception e)
+      }
+      catch (Exception e)
       {
         // Log
       }
       return d.Id;
     }
 
-    public async Task<DocumentWithHistoryDto> GetFullDocument(int documentId, int userId)
+    public async Task<DocumentWithHistoryDto> GetFullDocument(int documentId, int requestingUserId = -1)
     {
       var document = await docRepo.GetById(documentId);
-      var user = await userRepo.GetById(userId);
+      if (document == null)
+      {
+        return null;
+      }
+
       var dto = mapper.Map<DocumentWithHistoryDto>(document);
-      dto.AvailableStatusChanges = document?.AvailableStatusChanges(user);
+      if (requestingUserId == -1)
+      {
+        return dto;
+      }
+
+      var user = await userRepo.GetById(requestingUserId);
+      dto.AvailableStatusChanges = document.AvailableStatusChanges(user);
+      dto.CanEdit = document.CanEdit(user);
       return dto;
     }
 
@@ -64,7 +76,7 @@ namespace DMS.Application.Documents
     }
 
     public async Task<bool> ChangeStatus(int documentId, int appUserId, DocumentStatus status, string message)
-    {      
+    {
       try
       {
         var document = await docRepo.GetById(documentId);
@@ -80,11 +92,25 @@ namespace DMS.Application.Documents
       return true;
     }
 
-    public IEnumerable<DocumentSummaryDto> FindDocuments(Func<Document, bool> predicate)
+    public async Task<IEnumerable<DocumentSummaryDto>> FindDocuments(Func<Document, bool> predicate, int requestingUserId = -1)
     {
       var documents = docRepo.GetAll().Where(predicate);
-      var summaries = mapper.Map<IEnumerable<DocumentSummaryDto>>(documents);
-      return summaries;
-    }   
+
+      if (requestingUserId != -1)
+      {
+        var user = await userRepo.GetById(requestingUserId);
+        if (user != null)
+        {
+          var summaries = documents.Select(d =>
+          {
+            var summary = mapper.Map<DocumentSummaryDto>(d);
+            summary.CanEdit = d.CanEdit(user);            
+            return summary;
+          });
+          return summaries;
+        }
+      }
+      return mapper.Map<IEnumerable<DocumentSummaryDto>>(documents);
+    }
   }
 }

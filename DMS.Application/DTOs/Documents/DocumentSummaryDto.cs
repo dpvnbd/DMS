@@ -12,5 +12,6 @@ namespace DMS.Application.DTOs.Documents
     public UserSummaryDto Author { get; set; }
     public string Title { get; set; }
     public DocumentStatus CurrentDocumentStatus { get; set; }
+    public bool CanEdit { get; set; }
   }
 }

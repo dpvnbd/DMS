@@ -19,13 +19,12 @@ namespace DMS.Application.Documents
 
     Task<int> EditDocument(DocumentContentsDto document);
 
-    Task<DocumentWithHistoryDto> GetFullDocument(int id, int userId);
+    Task<DocumentWithHistoryDto> GetFullDocument(int id, int requestingUserId = -1);
 
     Task<DocumentContentsDto> GetDocumentContents(int id);
 
     Task<bool> ChangeStatus(int documentId, int appUserId, DocumentStatus status, string message);
 
-    IEnumerable<DocumentSummaryDto> FindDocuments(Func<Document, bool> predicate);
-    
+    Task<IEnumerable<DocumentSummaryDto>> FindDocuments(Func<Document, bool> predicate, int requestingUserId = -1);    
   }
 }

@@ -8,7 +8,7 @@
     var d = (DocumentWithHistoryDto)ViewData["Document"];
 }
 
-
+<hr/>
 <div class="card">
     <div class="card-header">
         <h2>@Html.DisplayFor(model => d.Title) <document-status-badge status="@d.CurrentDocumentStatus" /></h2>
@@ -23,10 +23,19 @@
         <p class="card-text">
             @Html.DisplayFor(model => d.Body)
         </p>
-        <a href="#" class="card-link">
-            @Html.ActionLink("Edit", "Edit", new { id = d.Id })
+        @if (d.CanEdit)
+        {
+        <a asp-action="Edit" asp-route-id="@d.Id" class="card-link">
+            Edit
         </a>
-        <a asp-action="Index" class="card-link">Back to List</a>
+        }
+        
+        @if (User.IsInRole("Admin"))
+        {
+        <a asp-action="Delete" asp-route-id="@d.Id" class="card-link">
+            Delete
+        </a>
+        }
     </div>
 </div>
 

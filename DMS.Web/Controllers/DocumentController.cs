@@ -36,7 +36,8 @@ namespace DMS.Web.Controllers
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-      var documents = documentService.FindDocuments(d => true);
+      var userId = await authService.GetUserIdByClaims(User);
+      var documents = await documentService.FindDocuments(d => true, userId);
       if (documents == null)
       {
         return NotFound();

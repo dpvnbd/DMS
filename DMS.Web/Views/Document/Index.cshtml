@@ -11,25 +11,44 @@
 </p>
 <table class="table">
     <tbody>
+        <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Review stage</th>
+        </tr>
         @foreach (var item in Model)
         {
-        <tr>
-            <td>
-                <a asp-action="Details" asp-route-id="@item.Id">@item.Title</a>
-            </td>
-            <td>
-                <a asp-action="Details" asp-controller="User" asp-route-id="@item.Author.Id">
-                    <user-badge user="@item.Author" />
-                </a>
-            </td>
-            <td>
-                <document-status-badge status="@item.CurrentDocumentStatus"/>               
+            <tr>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id">@item.Title</a>
+                </td>
+                <td>
+                    <a asp-action="Details" asp-controller="User" asp-route-id="@item.Author.Id">
+                        <user-badge user="@item.Author" />
+                    </a>
+                </td>
+                <td>
+                    <document-status-badge status="@item.CurrentDocumentStatus" />
 
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new {  id=item.Id  })
-            </td>
-        </tr>
+                </td>
+                @if (item.CanEdit)
+                {
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="card-link">
+                            Edit
+                        </a>
+                    </td>
+                }
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <td>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="card-link">
+                            Delete
+                        </a>
+                    </td>
+                }
+            </tr>
         }
     </tbody>
 </table>
