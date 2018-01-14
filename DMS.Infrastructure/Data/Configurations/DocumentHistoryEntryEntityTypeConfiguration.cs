@@ -7,13 +7,17 @@ using System.Text;
 
 namespace DMS.Infrastructure.Data.Configurations
 {
-  class StatusChangeEntityTypeConfiguration : IEntityTypeConfiguration<StatusChange>
+  class DocumentHistoryEntryEntityTypeConfiguration : IEntityTypeConfiguration<DocumentHistoryEntry>
   {
-    public void Configure(EntityTypeBuilder<StatusChange> builder)
+    public void Configure(EntityTypeBuilder<DocumentHistoryEntry> builder)
     {
       builder.HasKey(s => s.Id);
       builder.HasOne(s => s.Document)
-        .WithMany(d => d.StatusChanges);
+        .WithMany(d => d.History);
+
+      builder.HasOne(s => s.User).WithMany().IsRequired();
+
+      builder.HasOne(s => s.OnBehalfOfUser).WithMany();
     }
   }
 }

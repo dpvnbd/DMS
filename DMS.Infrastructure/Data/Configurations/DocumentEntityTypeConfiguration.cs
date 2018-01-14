@@ -13,10 +13,10 @@ namespace DMS.Infrastructure.Data.Configurations
     {
       documentConfiguration.HasKey(d => d.Id);
 
-      var navigation = documentConfiguration.Metadata.FindNavigation(nameof(Document.StatusChanges));
+      var navigation = documentConfiguration.Metadata.FindNavigation(nameof(Document.History));
       navigation.SetPropertyAccessMode(PropertyAccessMode.Field);
 
-      documentConfiguration.HasMany(d => d.StatusChanges)
+      documentConfiguration.HasMany(d => d.History)
         .WithOne(s => s.Document);
 
       documentConfiguration.HasOne(d => d.Author).WithMany();

@@ -17,5 +17,7 @@ namespace DMS.Web.Models.Document
     [Required]
     [StringLength(1023, MinimumLength = 3)]
     public string Body { get; set; }
+
+    public string Message { get; set; }
   }
 }

@@ -27,7 +27,7 @@ namespace DMS.Application.Documents
     public async Task<int> CreateDocument(DocumentContentsDto d)
     {
       var author = await userRepo.GetById(d.AuthorId);
-      var document = new Document(d.Title, d.Body, author);
+      var document = new Document(d.Title, d.Body, author, d.Message);
       await docRepo.Create(document);
       return document.Id;
     }
@@ -38,7 +38,7 @@ namespace DMS.Application.Documents
       {
         var editor = await userRepo.GetById(d.AuthorId);
         var document = await docRepo.GetById(d.Id);
-        document.Edit(editor, d.Title, d.Body);
+        document.Edit(editor, d.Title, d.Body, d.Message);
         await docRepo.Update(document);
       }
       catch (Exception e)

@@ -10,33 +10,40 @@ namespace DMS.Domain.Entities
   public enum DocumentStatus
   {
     /// <summary>
-    /// Customer created a new document
+    /// Document has been created by customer and submitted for Operator review
     /// </summary>
     Created,
 
     /// <summary>
-    /// Customer created or edited document and submitted it for review
-    /// </summary>
-    Submitted,
-
-    /// <summary>
-    /// Operator reviewed a document and sent it back for fixing errors
+    /// Operator reviewed a document and rejects it
     /// </summary>
     Rejected,
 
+
     /// <summary>
-    /// Operator reviewed a document and sent it further for expert review
+    /// Customer has edited the Rejected document and submits it again for Operator review
+    /// </summary>
+    Resubmitted,
+
+    /// <summary>
+    /// Operator has reviewed a document and sends it further for Expert review
+    /// </summary>
+    Registered,
+
+    /// <summary>
+    /// Expert has reviewed a document and accepts the request
     /// </summary>
     Approved,
 
     /// <summary>
-    /// Expert reviewed a document and accepted the request
+    /// Document has been discarded during the Operator or Expert review and can't be resubmitted
     /// </summary>
-    Accepted,
+    Canceled,
+
 
     /// <summary>
-    /// Expert reviewed a document and declined the request
+    /// Expert has fulfilled the request
     /// </summary>
-    Declined
+    Done
   }
 }

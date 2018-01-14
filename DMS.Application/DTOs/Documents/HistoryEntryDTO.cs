@@ -6,10 +6,11 @@ using System.Text;
 
 namespace DMS.Application.DTOs.Documents
 {
-  public class StatusChangeDto
+  public class HistoryEntryDto
   {
-    public UserSummaryDto ChangeAuthor { get; set; }
-    public DocumentStatus Status { get; set; }
+    public UserSummaryDto User { get; set; }
+    public UserSummaryDto OnBehalfOfUser { get; set; }
+    public DocumentStatus? Status { get; set; }
     public string Message { get; set; }
     public DateTime Created { get; protected set; }
   }

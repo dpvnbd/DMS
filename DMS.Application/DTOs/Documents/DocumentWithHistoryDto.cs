@@ -12,10 +12,11 @@ namespace DMS.Application.DTOs.Documents
     public DateTime Created { get; set; }
     public DateTime Modified { get; set; }
     public UserSummaryDto Author { get; set; }
+    public UserSummaryDto OnBehalfOfUser { get; set; }
     public string Title { get; set; }
     public string Body { get; set; }
-    public IEnumerable<StatusChangeDto> History { get; set; }
-    public DocumentStatus CurrentDocumentStatus { get; set; }
+    public IEnumerable<HistoryEntryDto> History { get; set; }
+    public DocumentStatus CurrentStatus { get; set; }
     public IEnumerable<DocumentStatus> AvailableStatusChanges { get; set; }
     public bool CanEdit { get; set; }
   }

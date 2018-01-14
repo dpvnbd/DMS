@@ -12,30 +12,34 @@ namespace DMS.Domain.Entities
     public DateTime Modified { get; protected set; }
     public AppUser Author { get; protected set; }
 
-    private List<StatusChange> statusChanges = new List<StatusChange>();
-    public IReadOnlyCollection<StatusChange> StatusChanges => statusChanges;
+    private List<DocumentHistoryEntry> history = new List<DocumentHistoryEntry>();
+    public IReadOnlyCollection<DocumentHistoryEntry> History => history;
 
     public string Title { get; protected set; }
     public string Body { get; protected set; }
 
-    public StatusChange LastStatusChange
+    private List<string> attachments = new List<string>();
+    public IReadOnlyCollection<string> Attachments => attachments;
+
+
+    public DocumentHistoryEntry LastHistoryEntry
     {
       get
       {
-        if (!statusChanges.Any())
+        if (history == null || !history.Any())
         {
           return null;
         }
-        return statusChanges[statusChanges.Count - 1];
+        return history[history.Count - 1];
       }
     }
 
-    public DocumentStatus CurrentDocumentStatus => (DocumentStatus)LastStatusChange?.Status;
+    public DocumentStatus CurrentStatus { get; protected set; }
 
     //Empty constructor for EF
     protected Document() { }
 
-    public Document(string title, string body, AppUser author)
+    public Document(string title, string body, AppUser author, string message = null, AppUser onBehalfOfUser = null)
     {
       if (string.IsNullOrWhiteSpace(title))
       {
@@ -52,36 +56,49 @@ namespace DMS.Domain.Entities
       Body = body;
       Created = DateTime.Now;
       Modified = Created;
-
-      statusChanges.Add(new StatusChange(author, DocumentStatus.Created, string.Empty, Created));
-    }    
+      history.Add(new DocumentHistoryEntry(author, DocumentStatus.Created,
+        message ?? string.Empty, Created, onBehalfOfUser));
+    }
 
     public IEnumerable<DocumentStatus> AvailableStatusChanges(AppUser user)
     {
       var list = new List<DocumentStatus>();
-      var status = LastStatusChange.Status;
-      
+
       var isAuthor = user.Id == Author.Id;
-      var isCustomer = user.Role == UserRole.Customer;
       var isOperator = user.Role == UserRole.Operator;
       var isExpert = user.Role == UserRole.Expert;
 
 
-      if ((status == DocumentStatus.Created || status == DocumentStatus.Rejected) && isAuthor)
+      if (isOperator)
       {
-        list.Add(DocumentStatus.Submitted);
+        if (CurrentStatus == DocumentStatus.Created || CurrentStatus == DocumentStatus.Resubmitted)
+        {
+          list.Add(DocumentStatus.Registered);
+          list.Add(DocumentStatus.Rejected);
+          list.Add(DocumentStatus.Canceled);
+        }
       }
 
-      if (status == DocumentStatus.Submitted && (isOperator || isExpert))
+      if (isExpert)
       {
-        list.Add(DocumentStatus.Approved);
-        list.Add(DocumentStatus.Rejected);
+        if (CurrentStatus == DocumentStatus.Registered)
+        {
+          list.Add(DocumentStatus.Approved);
+          list.Add(DocumentStatus.Canceled);
+        }
+        else if (CurrentStatus == DocumentStatus.Approved)
+        {
+          list.Add(DocumentStatus.Done);
+        }
       }
 
-      if (status == DocumentStatus.Approved && isExpert)
+      if (CurrentStatus == DocumentStatus.Rejected && isAuthor)
       {
-        list.Add(DocumentStatus.Accepted);
-        list.Add(DocumentStatus.Declined);
+        // Allow user to resubmit only if he recently edited the document
+        if(LastHistoryEntry.User.Id == user.Id && !LastHistoryEntry.Status.HasValue)
+        {
+          list.Add(DocumentStatus.Resubmitted);
+        }
       }
 
       return list;
@@ -98,29 +115,41 @@ namespace DMS.Domain.Entities
         throw new InvalidOperationException("Can't change document status");
       }
 
-      if(message == null)
+      if (message == null)
       {
         message = string.Empty;
       }
 
-      statusChanges.Add(new StatusChange(changeAuthor, newStatus, message, DateTime.Now));
+      history.Add(new DocumentHistoryEntry(changeAuthor, newStatus, message, DateTime.Now));
+
+      CurrentStatus = newStatus;
     }
 
     public bool CanEdit(AppUser user)
     {
-      var currentStatus = CurrentDocumentStatus;
-      // Author can edit his document before submition
-      if (user.Id == Author.Id &&
-        (currentStatus == DocumentStatus.Created || currentStatus == DocumentStatus.Rejected))
+      var isAuthor = user.Id == Author.Id;
+      var isOperator = user.Role == UserRole.Operator;
+      var isExpert = user.Role == UserRole.Expert;
+
+      if (isAuthor && CurrentStatus == DocumentStatus.Rejected)
       {
         return true;
       }
 
-      // Experts can always edit the document
-      return user.Role == UserRole.Expert;
+      if (isOperator && (CurrentStatus == DocumentStatus.Created || CurrentStatus == DocumentStatus.Resubmitted))
+      {
+        return true;
+      }
+
+      if (isExpert && CurrentStatus == DocumentStatus.Registered)
+      {
+        return true;
+      }
+
+      return false;
     }
 
-    public void Edit(AppUser editAuthor, string title, string body)
+    public void Edit(AppUser editAuthor, string title, string body, string message)
     {
       var canEdit = CanEdit(editAuthor);
 
@@ -137,11 +166,18 @@ namespace DMS.Domain.Entities
       if (string.IsNullOrWhiteSpace(body))
       {
         throw new ArgumentException("Body can't be empty", nameof(body));
-      }          
+      }
+
+      if (message == null)
+      {
+        message = string.Empty;
+      }
 
       Title = title;
       Body = body;
       Modified = DateTime.Now;
+
+      history.Add(new DocumentHistoryEntry(editAuthor, null, message, Modified));
     }
   }
 }

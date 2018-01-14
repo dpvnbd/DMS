@@ -9,34 +9,44 @@ namespace DMS.Web.TagHelpers
 {
   public class DocumentStatusBadgeTagHelper : TagHelper
   {
-    public DocumentStatus Status { get; set; }
+    public DocumentStatus? Status { get; set; }
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
       output.TagName = "span";
       string badgeColor = "badge-secondary";
 
-      output.Content.SetHtmlContent(Status.ToString());
-
-      switch (Status)
+      if (Status.HasValue)
       {
-        case DocumentStatus.Created:
-          badgeColor = "badge-secondary";
-          break;
-        case DocumentStatus.Submitted:
-          badgeColor = "badge-info";
-          break;
-        case DocumentStatus.Rejected:
-          badgeColor = "badge-warning";
-          break;
-        case DocumentStatus.Approved:
-          badgeColor = "badge-primary";
-          break;
-        case DocumentStatus.Accepted:
-          badgeColor = "badge-success";
-          break;
-        case DocumentStatus.Declined:
-          badgeColor = "badge-danger";
-          break;        
+        output.Content.SetHtmlContent(Status.ToString());
+
+        switch (Status.Value)
+        {
+          case DocumentStatus.Created:
+            badgeColor = "badge-secondary";
+            break;
+          case DocumentStatus.Rejected:
+            badgeColor = "badge-warning";
+            break;
+          case DocumentStatus.Resubmitted:
+            badgeColor = "badge-secondary";
+            break;
+          case DocumentStatus.Registered:
+            badgeColor = "badge-primary";
+            break;
+          case DocumentStatus.Approved:
+            badgeColor = "badge-success";
+            break;
+          case DocumentStatus.Canceled:
+            badgeColor = "badge-danger";
+            break;
+          case DocumentStatus.Done:
+            badgeColor = "badge-success";
+            break;
+        }
+      }
+      else
+      {
+        output.Content.SetHtmlContent("Edited");
       }
 
       output.Attributes.Add("class", "badge " + badgeColor);

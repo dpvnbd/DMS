@@ -133,12 +133,6 @@ namespace DMS.Web.Controllers
     }
 
     [HttpPost]
-    public async Task<IActionResult> Submit(SubmitStatusChangeViewModel model)
-    {
-      return await ChangeStatus(DocumentStatus.Submitted, model);
-    }
-
-    [HttpPost]
     public async Task<IActionResult> Reject(SubmitStatusChangeViewModel model)
     {
       return await ChangeStatus(DocumentStatus.Rejected, model);
@@ -151,15 +145,27 @@ namespace DMS.Web.Controllers
     }
 
     [HttpPost]
-    public async Task<IActionResult> Decline(SubmitStatusChangeViewModel model)
+    public async Task<IActionResult> Cancel(SubmitStatusChangeViewModel model)
     {
-      return await ChangeStatus(DocumentStatus.Declined, model);
+      return await ChangeStatus(DocumentStatus.Canceled, model);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Accept(SubmitStatusChangeViewModel model)
+    public async Task<IActionResult> Register(SubmitStatusChangeViewModel model)
     {
-      return await ChangeStatus(DocumentStatus.Accepted, model);
+      return await ChangeStatus(DocumentStatus.Registered, model);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Resubmit(SubmitStatusChangeViewModel model)
+    {
+      return await ChangeStatus(DocumentStatus.Resubmitted, model);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Done(SubmitStatusChangeViewModel model)
+    {
+      return await ChangeStatus(DocumentStatus.Done, model);
     }
 
     [HttpGet]

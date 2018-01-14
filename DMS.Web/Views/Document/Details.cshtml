@@ -8,11 +8,18 @@
     var d = (DocumentWithHistoryDto)ViewData["Document"];
 }
 
-<hr/>
+<hr />
 <div class="card">
     <div class="card-header">
-        <h2>@Html.DisplayFor(model => d.Title) <document-status-badge status="@d.CurrentDocumentStatus" /></h2>
+        <h2>@Html.DisplayFor(model => d.Title) <document-status-badge status="@d.CurrentStatus" /></h2>
         <h6 class="card-subtitle mb-2 text-muted">
+            @if (d.OnBehalfOfUser != null)
+            {
+                @:On behalf of
+                <a asp-action="Details" asp-controller="User" asp-route-id="@d.OnBehalfOfUser.Id">
+                    <user-badge user="@d.OnBehalfOfUser" />
+                </a>
+            }
             Created by <a asp-action="Details" asp-controller="User" asp-route-id="@d.Author.Id">
                 <user-badge user="@d.Author" />
             </a>
@@ -25,16 +32,16 @@
         </p>
         @if (d.CanEdit)
         {
-        <a asp-action="Edit" asp-route-id="@d.Id" class="card-link">
-            Edit
-        </a>
+            <a asp-action="Edit" asp-route-id="@d.Id" class="card-link">
+                Edit
+            </a>
         }
-        
+
         @if (User.IsInRole("Admin"))
         {
-        <a asp-action="Delete" asp-route-id="@d.Id" class="card-link">
-            Delete
-        </a>
+            <a asp-action="Delete" asp-route-id="@d.Id" class="card-link">
+                Delete
+            </a>
         }
     </div>
 </div>
@@ -62,14 +69,14 @@
                     {
                         switch (permission)
                         {
-                            case DocumentStatus.Submitted:
-                                <button asp-action="Submit" type="submit" class="btn btn-primary">
-                                    Submit
-                                </button>
-                                break;
                             case DocumentStatus.Approved:
                                 <button asp-action="Approve" type="submit" class="btn btn-success">
                                     Approve
+                                </button>
+                                break;
+                            case DocumentStatus.Canceled:
+                                <button asp-action="Cancel" type="submit" class="btn btn-danger">
+                                    Cancel
                                 </button>
                                 break;
                             case DocumentStatus.Rejected:
@@ -77,14 +84,19 @@
                                     Reject
                                 </button>
                                 break;
-                            case DocumentStatus.Accepted:
-                                <button asp-action="Accept" type="submit" class="btn btn-success">
-                                    Accept
+                            case DocumentStatus.Registered:
+                                <button asp-action="Register" type="submit" class="btn btn-primary">
+                                    Register
                                 </button>
                                 break;
-                            case DocumentStatus.Declined:
-                                <button asp-action="Decline" type="submit" class="btn btn-danger">
-                                    Decline
+                            case DocumentStatus.Resubmitted:
+                                <button asp-action="Resubmit" type="submit" class="btn btn-primary">
+                                    Resubmit
+                                </button>
+                                break;
+                            case DocumentStatus.Done:
+                                <button asp-action="Done" type="submit" class="btn btn-success">
+                                    Done
                                 </button>
                                 break;
                             default:
@@ -106,9 +118,18 @@
                 @Html.DisplayFor(m => status.Created)
             </h6>
             <p class="card-text">
-                <a asp-action="Details" asp-controller="User" asp-route-id="@status.ChangeAuthor.Id">
-                    <user-badge user="@status.ChangeAuthor" />
-                </a>: <document-status-badge status="@status.Status" />
+                <a asp-action="Details" asp-controller="User" asp-route-id="@status.User.Id">
+                    <user-badge user="@status.User" />
+                </a>
+                @if (status.OnBehalfOfUser != null)
+                {
+                    @:(On behalf of
+                    <a asp-action="Details" asp-controller="User" asp-route-id="@status.OnBehalfOfUser.Id">
+                        <user-badge user="@status.OnBehalfOfUser" />
+                    </a>
+                    @:)
+                }
+                : <document-status-badge status="@status.Status" />
                 @if (!string.IsNullOrWhiteSpace(status.Message))
                 {
                     @:Message: @Html.DisplayFor(m => status.Message)

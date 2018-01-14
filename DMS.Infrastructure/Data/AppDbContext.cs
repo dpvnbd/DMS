@@ -13,7 +13,7 @@ namespace DMS.Infrastructure.Data
   {
     public DbSet<Document> Documents { get; set; }
     public DbSet<AppUser> DomainUsers { get; set; }
-    public DbSet<StatusChange> StatusChanges { get; set; }
+    public DbSet<DocumentHistoryEntry> StatusChanges { get; set; }
 
     public AppDbContext(DbContextOptions options) : base(options)
     {
@@ -25,7 +25,7 @@ namespace DMS.Infrastructure.Data
 
       modelBuilder.ApplyConfiguration(new AppUserEntityTypeConfiguration());
       modelBuilder.ApplyConfiguration(new DocumentEntityTypeConfiguration());
-      modelBuilder.ApplyConfiguration(new StatusChangeEntityTypeConfiguration());
+      modelBuilder.ApplyConfiguration(new DocumentHistoryEntryEntityTypeConfiguration());
       modelBuilder.ApplyConfiguration(new AppIdentityUserEntityTypeConfiguration());
     }
   }
