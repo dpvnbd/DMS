@@ -261,3 +261,4 @@ __pycache__/
 *.pyc
 
 /DMS.Web/wwwroot/lib
+/DMS.Infrastructure/Migrations
