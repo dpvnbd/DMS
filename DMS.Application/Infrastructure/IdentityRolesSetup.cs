@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DMS.Application.Infrastructure
 {
@@ -60,7 +59,7 @@ namespace DMS.Application.Infrastructure
           if (createPowerUser.Succeeded)
           {
             //here we tie the new user to the role
-            UserManager.AddToRoleAsync(poweruser, AppUserIdentityRoleEnum.Admin.ToString()).RunSynchronously();
+            var rolesResult = UserManager.AddToRoleAsync(poweruser, AppUserIdentityRoleEnum.Admin.ToString()).Result;
           }
         }
       }
