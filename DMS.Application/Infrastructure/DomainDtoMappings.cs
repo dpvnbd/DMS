@@ -7,6 +7,7 @@ using DMS.Infrastructure.Data.Identity;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace DMS.Application.Infrastructure
 {
@@ -17,9 +18,10 @@ namespace DMS.Application.Infrastructure
       CreateMap<AppUser, UserSummaryDto>();
       CreateMap<DocumentHistoryEntry, HistoryEntryDto>();
       CreateMap<Document, DocumentWithHistoryDto>();
+
       CreateMap<Document, DocumentSummaryDto>();
 
-      CreateMap<Document, DocumentContentsDto>().ForMember(dto => dto.AuthorId, m => m.MapFrom(d => d.Author.Id));
+      CreateMap<Document, DocumentContentsDto>();
 
       CreateMap<AppUser, UserFullDto>();
 

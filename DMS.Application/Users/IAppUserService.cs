@@ -9,9 +9,11 @@ namespace DMS.Application.Users
 {
   public interface IAppUserService
   {
-    Task<UserFullDto> GetUser(int id);
+    Task<UserFullDto> GetUser(int id, int requestingUserId = -1);
 
-    IEnumerable<UserSummaryDto> FindUsers(Func<AppUser, bool> predicate);
+    Task<UserSummaryDto> GetUserSummary(int id, int requestingUserId = -1);
+
+    Task<IEnumerable<UserSummaryDto>> FindUsers(Func<AppUser, bool> predicate, int requestingUserId = -1);
 
     Task<bool> SetRole(int userId, UserRole role);   
   }

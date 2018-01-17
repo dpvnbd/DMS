@@ -9,7 +9,7 @@ namespace DMS.Domain.Entities
   {
     public AppUser User { get; protected set; }
     public Document Document { get; protected set; }
-    public AppUser OnBehalfOfUser { get; protected set; }
+    public AppUser UserActingOnBehalf { get; protected set; }
     public DateTime Created { get; protected set; }
 
     /// <summary>
@@ -24,14 +24,14 @@ namespace DMS.Domain.Entities
     protected DocumentHistoryEntry() { }
 
     public DocumentHistoryEntry(AppUser changeAuthor, DocumentStatus? status,
-      string message, DateTime created, AppUser onBehalfOfUser = null)
+      string message, DateTime created, AppUser userActingOnBehalf = null)
     {
       User = changeAuthor ?? throw new ArgumentNullException(nameof(changeAuthor));
       Message = message ?? throw new ArgumentNullException(nameof(message));
 
       Status = status;
       Created = created;
-      OnBehalfOfUser = onBehalfOfUser;
+      UserActingOnBehalf = userActingOnBehalf;
     }
   }
 }

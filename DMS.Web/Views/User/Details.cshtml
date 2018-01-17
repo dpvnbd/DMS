@@ -11,6 +11,14 @@
         <hr />
         <a asp-action="Identity" asp-route-id="@Model.Id">Manage user</a>
     }
+
+    @if (Model.CanCreateOnBehalfOfUser)
+    {
+        <hr />
+        <a asp-action="Create" asp-controller="Document" asp-route-onBehalfOfUserId="@Model.Id">
+            Create a document on user's behalf
+        </a>
+    }
     <hr />
     <dl class="dl-horizontal">
         <dt>

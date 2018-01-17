@@ -1,18 +1,29 @@
-﻿@model DMS.Web.Models.Document.DocumentEditingViewModel
+﻿@using DMS.Application.DTOs.Users
+@model DMS.Web.Models.Document.DocumentEditingViewModel
 
 @{
-  var title = (string)ViewData["Title"];
-  var action = (string)ViewData["Action"];
+    var title = (string)ViewData["Title"];
+    var action = (string)ViewData["Action"];
+
+    var onBehalfUser = (UserSummaryDto)ViewData["OnBehalfUser"];
 }
 
 <h2>@title</h2>
-
+@if (onBehalfUser != null)
+{
+    @: Creating on behalf of
+    <a asp-action="Details" asp-controller="User" asp-route-id="@onBehalfUser.Id">
+        <user-badge user="@onBehalfUser" />
+    </a>
+}
 <hr />
 <div class="row">
     <div class="col-md-10">
         <form asp-action="CreateEdit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             @Html.HiddenFor(m => m.Id)
+            @Html.HiddenFor(m => m.OnBehalfOfUserId)
+
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
                 <input asp-for="Title" class="form-control" />

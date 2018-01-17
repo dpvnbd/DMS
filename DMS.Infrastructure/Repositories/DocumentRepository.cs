@@ -19,7 +19,9 @@ namespace DMS.Infrastructure.Repositories
 
     public override IQueryable<Document> GetAll()
     {
-      return base.GetAll().Include(d => d.Author).Include(d => d.History).ThenInclude(s => s.User);
+      return base.GetAll().Include(d => d.Author).Include(d => d.CreatorOnBehalfOfAuthor)
+        .Include(d => d.History).ThenInclude(s => s.User)
+        .Include(d => d.History).ThenInclude(s => s.UserActingOnBehalf);
     }   
   }
 }

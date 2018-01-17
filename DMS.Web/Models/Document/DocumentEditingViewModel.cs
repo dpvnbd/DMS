@@ -10,6 +10,8 @@ namespace DMS.Web.Models.Document
   {
     public int Id { get; set; }
 
+    public int? OnBehalfOfUserId { get; set; }
+
     [Required]
     [StringLength(30, MinimumLength = 1)]
     public string Title { get; set; }

@@ -72,7 +72,6 @@ namespace DMS.Web
       }
 
       app.UseAuthentication();
-      IdentityRolesSetup.CreateRoles(app.ApplicationServices);
       
       app.UseStaticFiles();
       app.UseMvcWithDefaultRoute();

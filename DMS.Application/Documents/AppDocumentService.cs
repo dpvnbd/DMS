@@ -23,29 +23,55 @@ namespace DMS.Application.Documents
       this.userRepo = userRepo;
       this.mapper = mapper;
     }
-
-    public async Task<int> CreateDocument(DocumentContentsDto d)
+    
+    public async Task<int> CreateDocument(DocumentContentsDto d, int authorId)
     {
-      var author = await userRepo.GetById(d.AuthorId);
-      var document = new Document(d.Title, d.Body, author, d.Message);
+      return await CreateDocument(d, authorId, -1);      
+    }
+
+    public async Task<int> CreateDocument(DocumentContentsDto d, int authorId, int userActingOnBehalfId = -1)
+    {
+      var author = await userRepo.GetById(authorId);
+
+      if (author == null)
+      {
+        throw new ArgumentException("Document Author not found", nameof(d));
+      }
+
+      Document document;
+
+      if (userActingOnBehalfId != -1)
+      {
+        var actingUser = await userRepo.GetById(userActingOnBehalfId);
+        if (actingUser == null)
+        {
+          throw new ArgumentException("Acting User not found", nameof(userActingOnBehalfId));
+        }
+        document = new Document(d.Title, d.Body, author, d.Message, actingUser);
+      }
+      else
+      {
+        document = new Document(d.Title, d.Body, author, d.Message);
+      }
+
       await docRepo.Create(document);
       return document.Id;
     }
 
-    public async Task<int> EditDocument(DocumentContentsDto d)
+    public async Task<bool> EditDocument(DocumentContentsDto d, int documentId, int editorId)
     {
       try
       {
-        var editor = await userRepo.GetById(d.AuthorId);
-        var document = await docRepo.GetById(d.Id);
+        var editor = await userRepo.GetById(editorId);
+        var document = await docRepo.GetById(documentId);
         document.Edit(editor, d.Title, d.Body, d.Message);
         await docRepo.Update(document);
       }
-      catch (Exception e)
+      catch (Exception)
       {
-        // Log
+        return false;
       }
-      return d.Id;
+      return true;
     }
 
     public async Task<DocumentWithHistoryDto> GetFullDocument(int documentId, int requestingUserId = -1)
@@ -104,7 +130,7 @@ namespace DMS.Application.Documents
           var summaries = documents.Select(d =>
           {
             var summary = mapper.Map<DocumentSummaryDto>(d);
-            summary.CanEdit = d.CanEdit(user);            
+            summary.CanEdit = d.CanEdit(user);
             return summary;
           });
           return summaries;
@@ -116,7 +142,7 @@ namespace DMS.Application.Documents
     public async Task<bool> Delete(int documentId)
     {
       var document = await docRepo.GetById(documentId);
-      if(document == null)
+      if (document == null)
       {
         return false;
       }
@@ -130,5 +156,7 @@ namespace DMS.Application.Documents
       }
       return true;
     }
+
+
   }
 }

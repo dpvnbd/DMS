@@ -17,7 +17,7 @@ namespace DMS.Infrastructure.Data.Configurations
 
       builder.HasOne(s => s.User).WithMany().IsRequired();
 
-      builder.HasOne(s => s.OnBehalfOfUser).WithMany();
+      builder.HasOne(s => s.UserActingOnBehalf).WithMany();
     }
   }
 }

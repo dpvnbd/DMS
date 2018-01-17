@@ -21,17 +21,60 @@ namespace DMS.Application.Users
       this.mapper = mapper;
     }
 
-    public IEnumerable<UserSummaryDto> FindUsers(Func<AppUser, bool> predicate)
+    private bool CanCreateOnBehalf(UserRole requestingUserRole, UserRole targetUserRole)
+    {
+      // TODO - find a place in domain to put authorization logic
+      return requestingUserRole == UserRole.Operator && targetUserRole == UserRole.Customer;
+    }
+
+    public async Task<IEnumerable<UserSummaryDto>> FindUsers(Func<AppUser, bool> predicate, int requestingUserId = -1)
     {
       var users = userRepo.GetAll().Where(predicate);
       var summaries = mapper.Map<IEnumerable<UserSummaryDto>>(users);
+
+      if (requestingUserId != -1)
+      {
+        var requestingUser = await userRepo.GetById(requestingUserId);
+        if (requestingUser != null)
+        {
+          summaries = summaries.Select(u =>
+            {
+              u.CanCreateOnBehalfOfUser = CanCreateOnBehalf(requestingUser.Role, u.Role);
+              return u;
+            });
+        }
+      }
       return summaries;
     }
 
-    public async Task<UserFullDto> GetUser(int id)
+    public async Task<UserFullDto> GetUser(int id, int requestingUserId = -1)
     {
       var user = await userRepo.GetById(id);
       var dto = mapper.Map<UserFullDto>(user);
+      if (requestingUserId != -1)
+      {
+        var requestingUser = await userRepo.GetById(requestingUserId);
+        if (requestingUser != null)
+        {
+          dto.CanCreateOnBehalfOfUser = CanCreateOnBehalf(requestingUser.Role, dto.Role);
+        }
+      }
+      return dto;
+    }
+
+    public async Task<UserSummaryDto> GetUserSummary(int id, int requestingUserId = -1)
+    {
+      var user = await userRepo.GetById(id);
+      var dto = mapper.Map<UserSummaryDto>(user);
+      if (requestingUserId != -1)
+      {
+        var requestingUser = await userRepo.GetById(requestingUserId);
+        if (requestingUser != null)
+        {
+          dto.CanCreateOnBehalfOfUser = CanCreateOnBehalf(requestingUser.Role, dto.Role);
+        }
+      }
+
       return dto;
     }
 

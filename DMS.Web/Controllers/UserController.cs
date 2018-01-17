@@ -22,15 +22,18 @@ namespace DMS.Web.Controllers
       this.authService = authService;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-      var users = userService.FindUsers(u => true);
+      var userId = await authService.GetUserIdByClaims(User);
+      var users = await userService.FindUsers(u => true, userId);
       return View(users);
     }
 
     public async Task<IActionResult> Details(int id)
     {
-      var user = await userService.GetUser(id);
+      var currentUserId = await authService.GetUserIdByClaims(User);
+
+      var user = await userService.GetUser(id, currentUserId);
       if (user == null)
       {
         return NotFound();

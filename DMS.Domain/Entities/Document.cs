@@ -11,16 +11,13 @@ namespace DMS.Domain.Entities
     public DateTime Created { get; protected set; }
     public DateTime Modified { get; protected set; }
     public AppUser Author { get; protected set; }
+    public AppUser CreatorOnBehalfOfAuthor { get; protected set; }
 
     private List<DocumentHistoryEntry> history = new List<DocumentHistoryEntry>();
     public IReadOnlyCollection<DocumentHistoryEntry> History => history;
 
     public string Title { get; protected set; }
     public string Body { get; protected set; }
-
-    private List<string> attachments = new List<string>();
-    public IReadOnlyCollection<string> Attachments => attachments;
-
 
     public DocumentHistoryEntry LastHistoryEntry
     {
@@ -39,7 +36,7 @@ namespace DMS.Domain.Entities
     //Empty constructor for EF
     protected Document() { }
 
-    public Document(string title, string body, AppUser author, string message = null, AppUser onBehalfOfUser = null)
+    public Document(string title, string body, AppUser author, string message = null, AppUser creatorOnBehalfOfAuthor = null)
     {
       if (string.IsNullOrWhiteSpace(title))
       {
@@ -51,20 +48,40 @@ namespace DMS.Domain.Entities
         throw new ArgumentException("Body can't be empty", nameof(body));
       }
 
+
+      if (creatorOnBehalfOfAuthor != null)
+      {
+        if (creatorOnBehalfOfAuthor.Role != UserRole.Operator)
+        {
+          throw new ArgumentException("Only Operator can create Documents on behalf of Customers");
+        }
+
+        if (author.Role != UserRole.Customer)
+        {
+          throw new ArgumentException("Document can't be created on behalf of user that isn't Customer");
+        }
+      }
       Author = author ?? throw new ArgumentNullException(nameof(author));
+      CreatorOnBehalfOfAuthor = creatorOnBehalfOfAuthor;
+
       Title = title;
       Body = body;
       Created = DateTime.Now;
       Modified = Created;
       history.Add(new DocumentHistoryEntry(author, DocumentStatus.Created,
-        message ?? string.Empty, Created, onBehalfOfUser));
+        message ?? string.Empty, Created, creatorOnBehalfOfAuthor));
+    }
+
+    private bool IsAuthor(AppUser user)
+    {
+      return user.Id == Author.Id || (CreatorOnBehalfOfAuthor != null && user.Id == CreatorOnBehalfOfAuthor.Id);
     }
 
     public IEnumerable<DocumentStatus> AvailableStatusChanges(AppUser user)
     {
       var list = new List<DocumentStatus>();
 
-      var isAuthor = user.Id == Author.Id;
+      var isAuthor = IsAuthor(user);
       var isOperator = user.Role == UserRole.Operator;
       var isExpert = user.Role == UserRole.Expert;
 
@@ -95,7 +112,7 @@ namespace DMS.Domain.Entities
       if (CurrentStatus == DocumentStatus.Rejected && isAuthor)
       {
         // Allow user to resubmit only if he recently edited the document
-        if(LastHistoryEntry.User.Id == user.Id && !LastHistoryEntry.Status.HasValue)
+        if (LastHistoryEntry.User.Id == user.Id && !LastHistoryEntry.Status.HasValue)
         {
           list.Add(DocumentStatus.Resubmitted);
         }
@@ -127,7 +144,7 @@ namespace DMS.Domain.Entities
 
     public bool CanEdit(AppUser user)
     {
-      var isAuthor = user.Id == Author.Id;
+      var isAuthor = IsAuthor(user);
       var isOperator = user.Role == UserRole.Operator;
       var isExpert = user.Role == UserRole.Expert;
 

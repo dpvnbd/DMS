@@ -13,16 +13,20 @@
     <div class="card-header">
         <h2>@Html.DisplayFor(model => d.Title) <document-status-badge status="@d.CurrentStatus" /></h2>
         <h6 class="card-subtitle mb-2 text-muted">
-            @if (d.OnBehalfOfUser != null)
-            {
-                @:On behalf of
-                <a asp-action="Details" asp-controller="User" asp-route-id="@d.OnBehalfOfUser.Id">
-                    <user-badge user="@d.OnBehalfOfUser" />
-                </a>
-            }
-            Created by <a asp-action="Details" asp-controller="User" asp-route-id="@d.Author.Id">
+            Author: <a asp-action="Details" asp-controller="User" asp-route-id="@d.Author.Id">
                 <user-badge user="@d.Author" />
             </a>
+            @if (d.CreatorOnBehalfOfAuthor != null)
+            {
+                var user = d.CreatorOnBehalfOfAuthor;
+                @:(Created on user's behalf by 
+                <a asp-action="Details" asp-controller="User" asp-route-id="@user.Id">
+                    <user-badge user="@user" />
+                </a>
+                @:)
+            }
+
+            
             on @Html.DisplayFor(model => d.Created)
         </h6>
     </div>
@@ -121,11 +125,11 @@
                 <a asp-action="Details" asp-controller="User" asp-route-id="@status.User.Id">
                     <user-badge user="@status.User" />
                 </a>
-                @if (status.OnBehalfOfUser != null)
+                @if (status.UserActingOnBehalf != null)
                 {
-                    @:(On behalf of
-                    <a asp-action="Details" asp-controller="User" asp-route-id="@status.OnBehalfOfUser.Id">
-                        <user-badge user="@status.OnBehalfOfUser" />
+                    @:(Acting on user's behalf:
+                    <a asp-action="Details" asp-controller="User" asp-route-id="@status.UserActingOnBehalf.Id">
+                        <user-badge user="@status.UserActingOnBehalf" />
                     </a>
                     @:)
                 }

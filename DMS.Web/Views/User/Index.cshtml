@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<DMS.Application.DTOs.Users.UserSummaryDto>
 
 @{
-    ViewData["Title"] = "All users";
+  ViewData["Title"] = "All users";
 }
 
 <h2>All users</h2>
@@ -17,6 +17,15 @@
                         <user-badge user="@item" />
                     </a>
                 </td>
+
+                @if (item.CanCreateOnBehalfOfUser) { 
+                  <td>
+                      <a asp-action="Create" asp-controller="Document" asp-route-onBehalfOfUserId="@item.Id">
+                        Create on behalf
+                      </a>
+                  </td>
+                }
+
             </tr>
         }
     </tbody>

@@ -6,6 +6,8 @@ using AutoMapper;
 using DMS.Application.Authentication;
 using DMS.Application.Documents;
 using DMS.Application.DTOs.Documents;
+using DMS.Application.DTOs.Users;
+using DMS.Application.Users;
 using DMS.Domain.Abstract;
 using DMS.Domain.Entities;
 using DMS.Infrastructure.Data.Identity;
@@ -19,16 +21,15 @@ namespace DMS.Web.Controllers
   [Authorize]
   public class DocumentController : Controller
   {
-    private readonly UserManager<AppIdentityUser> userManager;
     private readonly IAppDocumentService documentService;
+    private readonly IAppUserService userService;
     private readonly IAuthService authService;
     private readonly IMapper mapper;
 
-    public DocumentController(UserManager<AppIdentityUser> userManager, IAppDocumentService documentService,
-      IAuthService authService, IMapper mapper)
+    public DocumentController(IAppDocumentService documentService, IAppUserService userService, IAuthService authService, IMapper mapper)
     {
-      this.userManager = userManager;
       this.documentService = documentService;
+      this.userService = userService;
       this.authService = authService;
       this.mapper = mapper;
     }
@@ -59,11 +60,22 @@ namespace DMS.Web.Controllers
     }
 
     [HttpGet]
-    public IActionResult Create()
+    public async Task<IActionResult> Create(int onBehalfOfUserId = -1)
     {
+      var model = new DocumentEditingViewModel();
       ViewData["Title"] = "Create document";
       ViewData["Action"] = "Create";
-      return View("Edit", new DocumentEditingViewModel());
+      if (onBehalfOfUserId != -1)
+      {
+        var user = await userService.GetUserSummary(onBehalfOfUserId);
+        if (user == null)
+        {
+          return NotFound();
+        }
+        ViewData["OnBehalfUser"] = user;
+        model.OnBehalfOfUserId = user.Id;
+      }
+      return View("Edit", model);
     }
 
 
@@ -91,21 +103,35 @@ namespace DMS.Web.Controllers
         return View("Edit", model);
       }
 
-      var userId = await authService.GetUserIdByClaims(User);
+      var currentUserId = await authService.GetUserIdByClaims(User);
 
-      var documentDto = mapper.Map<DocumentContentsDto>(model);
-      documentDto.AuthorId = userId;
-      int id;
+      var contents = mapper.Map<DocumentContentsDto>(model);
+
+
       if (model.Id != 0)
       {
-        id = await documentService.EditDocument(documentDto);
+        var success = await documentService.EditDocument(contents, model.Id, currentUserId);
+        if (!success)
+        {
+          ModelState.AddModelError(string.Empty, "Unable to edit the document");
+          return View("Edit", model);
+        }
+        return RedirectToAction("Details", "Document", new { model.Id });
+
       }
       else
       {
-        id = await documentService.CreateDocument(documentDto);
+        int id;
+        if (model.OnBehalfOfUserId.HasValue)
+        {
+          id = await documentService.CreateDocument(contents, model.OnBehalfOfUserId.Value, currentUserId);
+        }
+        else
+        {
+          id = await documentService.CreateDocument(contents, currentUserId);
+        }
+        return RedirectToAction("Details", "Document", new { id });
       }
-
-      return RedirectToAction("Details", "Document", new { id });
     }
 
     /// <summary>
@@ -189,8 +215,9 @@ namespace DMS.Web.Controllers
       var success = await documentService.Delete(id);
       if (!success)
       {
-        return RedirectToAction("Details", new {  id })
-;     }
+        return RedirectToAction("Details", new { id })
+;
+      }
       return RedirectToAction("Index");
     }
   }

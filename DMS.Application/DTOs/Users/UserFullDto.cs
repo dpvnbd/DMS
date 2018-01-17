@@ -12,5 +12,8 @@ namespace DMS.Application.DTOs.Users
     public string LastName { get; set; }
     public string FullName { get; set; }
     public UserRole Role { get; set; }
+
+    public bool CanCreateOnBehalfOfUser { get; set; }
+
   }
 }
