@@ -21,7 +21,7 @@ namespace DMS.Infrastructure.Data
 
       var connectionString = configuration.GetConnectionString("DMS");
 
-      builder.UseSqlServer(connectionString);
+      builder.UseMySql(connectionString);
 
       return new AppDbContext(builder.Options);
     }

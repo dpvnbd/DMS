@@ -36,7 +36,7 @@ namespace DMS.Web
     public void ConfigureServices(IServiceCollection services)
     {
       services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DMS")));
+                options.UseMySql(Configuration.GetConnectionString("DMS")));
 
       services.AddIdentity<AppIdentityUser, AppIdentityRole>(options =>
       {
