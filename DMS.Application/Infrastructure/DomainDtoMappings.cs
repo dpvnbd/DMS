@@ -17,7 +17,7 @@ namespace DMS.Application.Infrastructure
     {
       CreateMap<AppUser, UserSummaryDto>();
       CreateMap<DocumentHistoryEntry, HistoryEntryDto>();
-      CreateMap<Document, DocumentWithHistoryDto>();
+      CreateMap<Document, DocumentWithHistoryDto>().ForMember(d=>d.History, m => m.Ignore());
 
       CreateMap<Document, DocumentSummaryDto>();
 

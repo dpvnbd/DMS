@@ -8,6 +8,7 @@ using DMS.Application.DTOs;
 using DMS.Application.DTOs.Documents;
 using DMS.Domain.Abstract;
 using DMS.Domain.Entities;
+using DMS.Application.DTOs.Users;
 
 namespace DMS.Application.Documents
 {
@@ -23,10 +24,10 @@ namespace DMS.Application.Documents
       this.userRepo = userRepo;
       this.mapper = mapper;
     }
-    
+
     public async Task<int> CreateDocument(DocumentContentsDto d, int authorId)
     {
-      return await CreateDocument(d, authorId, -1);      
+      return await CreateDocument(d, authorId, -1);
     }
 
     public async Task<int> CreateDocument(DocumentContentsDto d, int authorId, int userActingOnBehalfId = -1)
@@ -83,14 +84,37 @@ namespace DMS.Application.Documents
       }
 
       var dto = mapper.Map<DocumentWithHistoryDto>(document);
+
+      dto.History = document.History.Select(e =>
+      {
+        var entryDto = mapper.Map<HistoryEntryDto>(e);
+        var user = userRepo.GetById(e.UserId).Result;
+        entryDto.User = mapper.Map<UserSummaryDto>(user);
+        if (e.UserActingOnBehalfId.HasValue)
+        {
+          var actingUser = userRepo.GetById(e.UserActingOnBehalfId.Value).Result;
+          entryDto.UserActingOnBehalf = mapper.Map<UserSummaryDto>(actingUser);
+        }
+        return entryDto;
+      });
+      
       if (requestingUserId == -1)
       {
         return dto;
       }
 
-      var user = await userRepo.GetById(requestingUserId);
-      dto.AvailableStatusChanges = document.AvailableStatusChanges(user);
-      dto.CanEdit = document.CanEdit(user);
+      var author = await userRepo.GetById(document.AuthorId);
+      dto.Author = mapper.Map<UserSummaryDto>(author);
+
+      if (document.CreatorOnBehalfOfAuthorId.HasValue)
+      {
+        var createorOnBehalf = await userRepo.GetById(document.CreatorOnBehalfOfAuthorId.Value);
+        dto.CreatorOnBehalfOfAuthor = mapper.Map<UserSummaryDto>(createorOnBehalf);
+      }
+
+      var requestingUser = await userRepo.GetById(requestingUserId);
+      dto.AvailableStatusChanges = document.AvailableStatusChanges(requestingUser);
+      dto.CanEdit = document.CanEdit(requestingUser);
       return dto;
     }
 
@@ -122,22 +146,25 @@ namespace DMS.Application.Documents
     {
       var documents = docRepo.GetAll().Where(predicate);
 
-      if (requestingUserId != -1)
+
+      return documents.Select(d =>
       {
-        var user = await userRepo.GetById(requestingUserId);
-        if (user != null)
+        var summary = mapper.Map<DocumentSummaryDto>(d);
+        if (requestingUserId != -1)
         {
-          var summaries = documents.Select(d =>
+          var requestingUser = userRepo.GetById(requestingUserId).Result;
+          if (requestingUser != null)
           {
-            var summary = mapper.Map<DocumentSummaryDto>(d);
-            summary.CanEdit = d.CanEdit(user);
-            return summary;
-          });
-          return summaries;
+            summary.CanEdit = d.CanEdit(requestingUser);
+          }
         }
-      }
-      return mapper.Map<IEnumerable<DocumentSummaryDto>>(documents);
+
+        var author = userRepo.GetById(d.AuthorId).Result;
+        summary.Author = mapper.Map<UserSummaryDto>(author);
+        return summary;
+      });
     }
+
 
     public async Task<bool> Delete(int documentId)
     {

@@ -10,8 +10,10 @@ namespace DMS.Domain.Entities
   {
     public DateTime Created { get; protected set; }
     public DateTime Modified { get; protected set; }
-    public AppUser Author { get; protected set; }
-    public AppUser CreatorOnBehalfOfAuthor { get; protected set; }
+    //public AppUser Author { get; protected set; }
+    public int AuthorId { get; protected set; }
+    //public AppUser CreatorOnBehalfOfAuthor { get; protected set; }
+    public int? CreatorOnBehalfOfAuthorId { get; protected set; }
 
     private List<DocumentHistoryEntry> history = new List<DocumentHistoryEntry>();
     public IReadOnlyCollection<DocumentHistoryEntry> History => history;
@@ -61,8 +63,13 @@ namespace DMS.Domain.Entities
           throw new ArgumentException("Document can't be created on behalf of user that isn't Customer");
         }
       }
-      Author = author ?? throw new ArgumentNullException(nameof(author));
-      CreatorOnBehalfOfAuthor = creatorOnBehalfOfAuthor;
+      if (author == null)
+      {
+        throw new ArgumentNullException(nameof(author));
+      }
+
+      AuthorId = author.Id;
+      CreatorOnBehalfOfAuthorId = creatorOnBehalfOfAuthor?.Id;
 
       Title = title;
       Body = body;
@@ -74,7 +81,7 @@ namespace DMS.Domain.Entities
 
     private bool IsAuthor(AppUser user)
     {
-      return user.Id == Author.Id || (CreatorOnBehalfOfAuthor != null && user.Id == CreatorOnBehalfOfAuthor.Id);
+      return user.Id == AuthorId || (CreatorOnBehalfOfAuthorId.HasValue && user.Id == CreatorOnBehalfOfAuthorId.Value);
     }
 
     public IEnumerable<DocumentStatus> AvailableStatusChanges(AppUser user)
@@ -112,7 +119,7 @@ namespace DMS.Domain.Entities
       if (CurrentStatus == DocumentStatus.Rejected && isAuthor)
       {
         // Allow user to resubmit only if he recently edited the document
-        if (LastHistoryEntry.User.Id == user.Id && !LastHistoryEntry.Status.HasValue)
+        if (LastHistoryEntry.UserId == user.Id && !LastHistoryEntry.Status.HasValue)
         {
           list.Add(DocumentStatus.Resubmitted);
         }

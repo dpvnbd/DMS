@@ -7,9 +7,8 @@ namespace DMS.Domain.Entities
 {
   public class DocumentHistoryEntry : BaseEntity
   {
-    public AppUser User { get; protected set; }
-    public Document Document { get; protected set; }
-    public AppUser UserActingOnBehalf { get; protected set; }
+    public int UserId { get; protected set; }
+    public int? UserActingOnBehalfId { get; protected set; }
     public DateTime Created { get; protected set; }
 
     /// <summary>
@@ -26,12 +25,16 @@ namespace DMS.Domain.Entities
     public DocumentHistoryEntry(AppUser changeAuthor, DocumentStatus? status,
       string message, DateTime created, AppUser userActingOnBehalf = null)
     {
-      User = changeAuthor ?? throw new ArgumentNullException(nameof(changeAuthor));
+      UserId = changeAuthor.Id;
       Message = message ?? throw new ArgumentNullException(nameof(message));
 
       Status = status;
       Created = created;
-      UserActingOnBehalf = userActingOnBehalf;
+
+      if (userActingOnBehalf != null)
+      {
+        UserActingOnBehalfId = userActingOnBehalf.Id;
+      }
     }
   }
 }

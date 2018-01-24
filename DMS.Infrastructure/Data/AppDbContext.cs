@@ -9,24 +9,24 @@ using System.Text;
 
 namespace DMS.Infrastructure.Data
 {
-  public class AppDbContext : IdentityDbContext<AppIdentityUser, AppIdentityRole, string>
-  {
-    public DbSet<Document> Documents { get; set; }
-    public DbSet<AppUser> DomainUsers { get; set; }
-    public DbSet<DocumentHistoryEntry> StatusChanges { get; set; }
+  //public class AppDbContext : IdentityDbContext<AppIdentityUser, AppIdentityRole, string>
+  //{
+  //  public DbSet<Document> Documents { get; set; }
+  //  public DbSet<AppUser> DomainUsers { get; set; }
+  //  public DbSet<DocumentHistoryEntry> StatusChanges { get; set; }
 
-    public AppDbContext(DbContextOptions options) : base(options)
-    {
-    }
+  //  public AppDbContext(DbContextOptions options) : base(options)
+  //  {
+  //  }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-      base.OnModelCreating(modelBuilder);
+  //  protected override void OnModelCreating(ModelBuilder modelBuilder)
+  //  {
+  //    base.OnModelCreating(modelBuilder);
 
-      modelBuilder.ApplyConfiguration(new AppUserEntityTypeConfiguration());
-      modelBuilder.ApplyConfiguration(new DocumentEntityTypeConfiguration());
-      modelBuilder.ApplyConfiguration(new DocumentHistoryEntryEntityTypeConfiguration());
-      modelBuilder.ApplyConfiguration(new AppIdentityUserEntityTypeConfiguration());
-    }
-  }
+  //    modelBuilder.ApplyConfiguration(new AppUserEntityTypeConfiguration());
+  //    modelBuilder.ApplyConfiguration(new DocumentEntityTypeConfiguration());
+  //    modelBuilder.ApplyConfiguration(new DocumentHistoryEntryEntityTypeConfiguration());
+  //    modelBuilder.ApplyConfiguration(new AppIdentityUserEntityTypeConfiguration());
+  //  }
+  //}
 }

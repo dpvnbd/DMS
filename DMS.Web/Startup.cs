@@ -12,15 +12,17 @@ using DMS.Domain.Entities;
 using DMS.Infrastructure;
 using DMS.Infrastructure.Data;
 using DMS.Infrastructure.Data.Identity;
-using DMS.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using AspNetCore.Identity.MongoDbCore;
+using DMS.Infrastructure.Repositories;
+using MongoDB.Driver;
+using DMS.Infrastructure.Data.MongoDb;
 
 namespace DMS.Web
 {
@@ -35,8 +37,10 @@ namespace DMS.Web
     // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
     public void ConfigureServices(IServiceCollection services)
     {
-      services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DMS")));
+      MongoMappings.SetupMappings();
+
+      var connectionString = Configuration.GetConnectionString("DMS");
+      var dbName = Configuration["MongoDbName"];
 
       services.AddIdentity<AppIdentityUser, AppIdentityRole>(options =>
       {
@@ -48,11 +52,21 @@ namespace DMS.Web
         options.Password.RequireLowercase = false;
         options.Password.RequiredUniqueChars = 1;
       })
-        .AddEntityFrameworkStores<AppDbContext>()
-        .AddDefaultTokenProviders();
+      .AddMongoDbStores<AppIdentityUser, AppIdentityRole, Guid>(
+       connectionString,
+       dbName
+      ).AddDefaultTokenProviders();
 
-      services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-      services.AddScoped<IRepository<Document>, DocumentRepository>();
+
+      services.AddSingleton<IMongoClient, MongoClient>(p => new MongoClient(connectionString));
+      services.AddScoped(p =>
+      {
+        var client = p.GetRequiredService<IMongoClient>();
+        return client.GetDatabase(dbName);
+      });
+
+
+      services.AddScoped(typeof(IRepository<>), typeof(MongoRepository<>));
 
       services.AddScoped<IAuthService, AuthService>();
       services.AddScoped<IAppDocumentService, AppDocumentService>();
@@ -72,7 +86,7 @@ namespace DMS.Web
       }
 
       app.UseAuthentication();
-      
+
       app.UseStaticFiles();
       app.UseMvcWithDefaultRoute();
     }

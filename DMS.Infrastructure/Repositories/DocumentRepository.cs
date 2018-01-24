@@ -11,17 +11,17 @@ using System.Threading.Tasks;
 
 namespace DMS.Infrastructure.Repositories
 {
-  public class DocumentRepository : Repository<Document>
-  {
-    public DocumentRepository(AppDbContext context) : base(context)
-    {
-    }  
+  //public class DocumentRepository : Repository<Document>
+  //{
+  //  public DocumentRepository(AppDbContext context) : base(context)
+  //  {
+  //  }  
 
-    public override IQueryable<Document> GetAll()
-    {
-      return base.GetAll().Include(d => d.Author).Include(d => d.CreatorOnBehalfOfAuthor)
-        .Include(d => d.History).ThenInclude(s => s.User)
-        .Include(d => d.History).ThenInclude(s => s.UserActingOnBehalf);
-    }   
-  }
+  //  public override IQueryable<Document> GetAll()
+  //  {
+  //    return base.GetAll().Include(d => d.Author).Include(d => d.CreatorOnBehalfOfAuthor)
+  //      .Include(d => d.History).ThenInclude(s => s.User)
+  //      .Include(d => d.History).ThenInclude(s => s.UserActingOnBehalf);
+  //  }   
+  //}
 }

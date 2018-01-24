@@ -41,7 +41,7 @@ namespace DMS.Application.Authentication
       {
         UserName = registerDTO.UserName,
         Email = registerDTO.Email,
-        AppUser = domainUser
+        AppUserId = domainUser.Id
       };
 
       var result = await userManager.CreateAsync(identityUser, registerDTO.Password);
@@ -126,7 +126,6 @@ namespace DMS.Application.Authentication
       {
         return null;
       }
-      user.AppUser = await userRepo.GetById(user.AppUserId);
       
       var dto = mapper.Map<UserIdentityDto>(user);
 

@@ -1,4 +1,5 @@
 ﻿using DMS.Application.Authentication;
+using DMS.Domain.Abstract;
 using DMS.Domain.Entities;
 using DMS.Infrastructure.Data.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -19,6 +20,7 @@ namespace DMS.Application.Infrastructure
         //initializing custom roles 
         var RoleManager = scope.ServiceProvider.GetRequiredService<RoleManager<AppIdentityRole>>();
         var UserManager = scope.ServiceProvider.GetRequiredService<UserManager<AppIdentityUser>>();
+        var userRepo = scope.ServiceProvider.GetRequiredService<IRepository<AppUser>>();
         var roleNames = new List<string>();
         foreach(var role in Enum.GetValues(typeof(AppUserIdentityRoleEnum)))
         {
@@ -47,11 +49,13 @@ namespace DMS.Application.Infrastructure
 
           var domainUser = new AppUser("Admin", "Admin", UserRole.Expert);
 
+          userRepo.Create(domainUser).Wait();
+
           var poweruser = new AppIdentityUser
           {
             UserName = "admin",
             Email = "admin@email.com",
-            AppUser = domainUser
+            AppUserId = domainUser.Id
           };
           string adminPassword = "DefaultAdminPassword";
 

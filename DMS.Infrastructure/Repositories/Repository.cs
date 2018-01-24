@@ -24,10 +24,10 @@ namespace DMS.Infrastructure.Repositories
       _dbContext = context;
     }
 
-    public Repository(AppDbContext context)
-    {
-      _dbContext = context;
-    }
+    //public Repository(AppDbContext context)
+    //{
+    //  _dbContext = context;
+    //}
 
     public virtual IQueryable<T> GetAll()
     {

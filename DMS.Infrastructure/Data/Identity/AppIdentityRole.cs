@@ -1,13 +1,14 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AspNetCore.Identity.MongoDbCore.Models;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace DMS.Infrastructure.Data.Identity
 {
-  public class AppIdentityRole : IdentityRole
+  public class AppIdentityRole : MongoIdentityRole
   {
-    protected AppIdentityRole()
+    public AppIdentityRole() : base()
     {
     }
 
