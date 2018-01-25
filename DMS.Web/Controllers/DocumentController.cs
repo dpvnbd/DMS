@@ -34,16 +34,61 @@ namespace DMS.Web.Controllers
       this.mapper = mapper;
     }
 
+    //[HttpGet]
+    //public async Task<IActionResult> Filter(DocumentsFilterViewModel model)
+    //{
+    //  return await Index(model.AuthorId, model.Status, model.SearchString);
+    //}
+
     [HttpGet]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int? authorId, DocumentStatus? status, string searchString, bool requireAttention)
     {
       var userId = await authService.GetUserIdByClaims(User);
-      var documents = await documentService.FindDocuments(d => true, userId);
+      
+
+      bool predicate(Document d)
+      {
+        if (authorId.HasValue && d.Author.Id != authorId.Value)
+        {
+          return false;
+        }
+
+        if (status.HasValue && d.CurrentStatus != status.Value)
+        {
+          return false;
+        }
+
+        if (!string.IsNullOrWhiteSpace(searchString))
+        {
+          if (!d.Title.Contains(searchString)
+          && !d.Body.Contains(searchString))
+          {
+            return false;
+          }
+        }
+        return true;
+      }
+
+      var documents = await documentService.FindDocuments(predicate, userId, requireAttention);
       if (documents == null)
       {
         return NotFound();
       }
-      return View(documents);
+      ViewData["documents"] = documents;
+
+      var filterModel = new DocumentsFilterViewModel
+      {
+        SearchString = searchString,
+        Status = status,
+        RequireAttention = requireAttention
+      };
+      if (authorId.HasValue)
+      {
+        var author = await userService.GetUserSummary(authorId.Value, userId);
+        ViewData["authorFilter"] = author;
+      }
+
+      return View("Index", filterModel);
     }
 
     [HttpGet]

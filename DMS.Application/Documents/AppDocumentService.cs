@@ -118,7 +118,8 @@ namespace DMS.Application.Documents
       return true;
     }
 
-    public async Task<IEnumerable<DocumentSummaryDto>> FindDocuments(Func<Document, bool> predicate, int requestingUserId = -1)
+    public async Task<IEnumerable<DocumentSummaryDto>> FindDocuments(Func<Document, bool> predicate,
+      int requestingUserId = -1, bool filterAvailableForReview = false)
     {
       var documents = docRepo.GetAll().Where(predicate);
 
@@ -127,12 +128,21 @@ namespace DMS.Application.Documents
         var user = await userRepo.GetById(requestingUserId);
         if (user != null)
         {
-          var summaries = documents.Select(d =>
+          var summaries = new List<DocumentSummaryDto>(documents.Count());
+          foreach(var d in documents)
           {
+            var canEdit = d.CanEdit(user); ;
+            if (filterAvailableForReview)
+            {
+              if (!d.AvailableStatusChanges(user).Any() && !canEdit)
+              {
+                continue;
+              }
+            }
             var summary = mapper.Map<DocumentSummaryDto>(d);
-            summary.CanEdit = d.CanEdit(user);
-            return summary;
-          });
+            summary.CanEdit = canEdit;
+            summaries.Add(summary);
+          }          
           return summaries;
         }
       }

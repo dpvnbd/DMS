@@ -13,7 +13,13 @@ namespace DMS.Web.TagHelpers
     public UserSummaryDto User { get; set; }
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
+      
       output.TagName = "span";
+      if (User == null)
+      {
+        output.Content.SetHtmlContent("null");
+        return;
+      }
       string badgeColor = "";
 
       switch (User.Role)

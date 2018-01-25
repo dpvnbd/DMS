@@ -37,15 +37,26 @@
         <div class="collapse navbar-collapse" id="mainNavbar">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
-                    <a class="nav-item nav-link" asp-action="Index" asp-controller="Document">Documents</a>
+                    <a class="nav-item nav-link" asp-action="Index" asp-controller="Document">All documents</a>
+                </li>
+                @if (user != null)
+                {
+                <li class="nav-item">
+                    <a class="nav-item nav-link" asp-action="Index" asp-controller="Document"
+                       asp-route-authorId="@user.Id">My documents</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-item nav-link" asp-action="Index" asp-controller="Document"
+                        asp-route-requireAttention="@true">Awaiting my review</a>
+                </li>
+                }
+                <li class="nav-item">
                     <a class="nav-item nav-link" asp-action="Index" asp-controller="User">Users</a>
-                </li>                
+                </li>
             </ul>
 
             <ul class="navbar-nav">
-                @if (User.Identity.IsAuthenticated)
+                @if (User.Identity.IsAuthenticated && user != null)
                 {
                     <li class="nav-item dropdown dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownAccount" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

@@ -1,54 +1,116 @@
-﻿@model IEnumerable<DMS.Application.DTOs.Documents.DocumentSummaryDto>
-
+﻿@model DMS.Web.Models.Document.DocumentsFilterViewModel
+@using DMS.Application.DTOs.Documents;
+@using DMS.Application.DTOs.Users;
+@using DMS.Domain.Entities;
 @{
-    ViewData["Title"] = "All documents";
+    ViewData["Title"] = "Documents";
+    var documents = (IEnumerable<DocumentSummaryDto>)ViewData["documents"];
+    var authorFilter = (UserSummaryDto)ViewData["authorFilter"];
+}
+<h3>
+    Documents
+    @if (authorFilter != null)
+    {
+        @: of
+        <a asp-action="Details" asp-controller="User" asp-route-id="@authorFilter.Id">
+            <user-badge user="authorFilter" />
+        </a>
+    }
+
+    @if (Model.RequireAttention)
+    {
+        @: available for review
+    }
+
+    @if (Model.Status.HasValue)
+    {
+        @: with status
+        <document-status-badge status="Model.Status.Value" />
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.SearchString))
+    {
+        @: that contain: "@Model.SearchString"
+    }
+</h3>
+
+<hr />
+<form method="get" asp-action="Index" class="form-inline">
+    @Html.HiddenFor(f => f.AuthorId)
+    <div class="form-check mr-sm-2">
+        <input class="form-check-input" type="checkbox" asp-for="RequireAttention">
+        <label class="form-check-label">
+            Require my attention
+        </label>
+    </div>
+    <select asp-for="Status" asp-items="Html.GetEnumSelectList<DocumentStatus>()" class="form-control mr-sm-2">
+        <option selected>Any status</option>
+    </select>
+    <input asp-for="SearchString" class="form-control mr-sm-2" placeholder="Search content" />
+    <button type="submit" class="btn btn-info">Filter</button>
+</form>
+<hr />
+
+@if (authorFilter != null && authorFilter.CanCreateOnBehalfOfUser)
+{
+    <a asp-action="Create" asp-controller="Document" asp-route-onBehalfOfUserId="@authorFilter.Id">
+        Create a new document on user's behalf
+    </a>
+}
+else
+{
+    <a asp-action="Create" asp-controller="Document" >
+        Create a new document
+    </a>
 }
 
-<h2>All documents</h2>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <tbody>
-        <tr>
-            <th>Title</th>
-            <th>Author</th>
-            <th>Review stage</th>
-        </tr>
-        @foreach (var item in Model)
-        {
+@if (documents != null && documents.Any())
+{
+    <table class="table">
+        <tbody>
             <tr>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.Id">@item.Title</a>
-                </td>
-                <td>
-                    <a asp-action="Details" asp-controller="User" asp-route-id="@item.Author.Id">
-                        <user-badge user="@item.Author" />
-                    </a>
-                </td>
-                <td>
-                    <document-status-badge status="@item.CurrentStatus" />
-
-                </td>
-                @if (item.CanEdit)
-                {
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="card-link">
-                            Edit
-                        </a>
-                    </td>
-                }
-
-                @if (User.IsInRole("Admin"))
-                {
-                    <td>
-                        <a asp-action="Delete" asp-route-id="@item.Id" class="card-link">
-                            Delete
-                        </a>
-                    </td>
-                }
+                <th>Title</th>
+                <th>Author</th>
+                <th>Review stage</th>
             </tr>
-        }
-    </tbody>
-</table>
+            @foreach (var item in documents)
+            {
+                <tr>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.Id">@item.Title</a>
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-controller="User" asp-route-id="@item.Author.Id">
+                            <user-badge user="@item.Author" />
+                        </a>
+                    </td>
+                    <td>
+                        <document-status-badge status="@item.CurrentStatus" />
+
+                    </td>
+                    @if (item.CanEdit)
+                    {
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="card-link">
+                                Edit
+                            </a>
+                        </td>
+                    }
+
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <td>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="card-link">
+                                Delete
+                            </a>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <h2 class="text-center">Search had no results </h2>
+}

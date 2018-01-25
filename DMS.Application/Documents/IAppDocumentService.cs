@@ -27,7 +27,8 @@ namespace DMS.Application.Documents
 
     Task<bool> ChangeStatus(int documentId, int editorId, DocumentStatus status, string message);
 
-    Task<IEnumerable<DocumentSummaryDto>> FindDocuments(Func<Document, bool> predicate, int requestingUserId = -1);
+    Task<IEnumerable<DocumentSummaryDto>> FindDocuments(Func<Document, bool> predicate,
+      int requestingUserId = -1, bool filterAvailableForReview = false);
 
     Task<bool> Delete(int documentId);
 

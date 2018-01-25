@@ -11,22 +11,29 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
-                <td>
-                    <a asp-action="Details" asp-controller="User" asp-route-id="@item.Id">
-                        <user-badge user="@item" />
-                    </a>
-                </td>
+        <tr>
+            <td>
+                <a asp-action="Details" asp-controller="User" asp-route-id="@item.Id">
+                    <user-badge user="@item" />
+                </a>
+            </td>
 
-                @if (item.CanCreateOnBehalfOfUser) { 
-                  <td>
-                      <a asp-action="Create" asp-controller="Document" asp-route-onBehalfOfUserId="@item.Id">
-                        Create on behalf
-                      </a>
-                  </td>
-                }
+            <td>
+                <a asp-action="Index" asp-controller="Document" asp-route-authorId="@item.Id">
+                    User's documents
+                </a>
+            </td>
 
-            </tr>
+            @if (item.CanCreateOnBehalfOfUser)
+    {
+        <td>
+            <a asp-action="Create" asp-controller="Document" asp-route-onBehalfOfUserId="@item.Id">
+                Create on behalf
+            </a>
+        </td>
+}
+
+        </tr>
         }
     </tbody>
 </table>
