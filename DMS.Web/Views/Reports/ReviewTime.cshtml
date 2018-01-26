@@ -1,0 +1,84 @@
+﻿@model DMS.Application.DTOs.Reports.StatusChangesTimeDto
+
+@{
+    ViewData["Title"] = "Review time report";
+}
+
+
+<div>
+    <h3>
+        @if (Model.TargetDocument != null)
+        {
+            @: Stats for document
+            <a asp-action="Details" asp-controller="Document" asp-route-id="@Model.TargetDocument.Id">
+                @Model.TargetDocument.Title
+            </a>
+            @: by
+            <a asp-action="Details" asp-controller="User" asp-route-id="@Model.TargetDocument.Author.Id">
+                <user-badge user="@Model.TargetDocument.Author" />
+            </a>
+        }
+
+        @if (Model.FromDate.HasValue)
+        {
+            @: From
+            @Model.FromDate.Value.ToShortDateString()
+        }
+
+        @if (Model.ToDate.HasValue)
+        {
+            @: To
+            @Model.ToDate.Value.ToShortDateString()
+        }
+    </h3>
+    <hr />
+    <h4>
+        @if (Model.TargetDocument != null)
+        {
+            @:Total
+        }
+        else
+        {
+            @:Average
+        }
+        duration of transitions between different stages
+    </h4>
+    @if (Model.StatusChangesTime != null && Model.StatusChangesTime.Any())
+    {
+        <table class="table">
+            <tr>
+                <th>Previous status</th>
+                <th>Next status</th>
+                <th>Time difference</th>
+            </tr>
+            @foreach (var statusPair in Model.StatusChangesTime)
+            {
+
+                <tr>
+                    <td>
+                        <document-status-badge status="statusPair.Key.FromStatus" />
+
+                    </td>
+                    <td>
+
+                        <document-status-badge status="statusPair.Key.ToStatus" />
+
+                    </td>
+                    <td>
+                            @statusPair.Value.ToString(@"hh\:mm\:ss")
+                    </td>
+                </tr>
+
+            }
+            <tr>
+                <td><b>Total</b></td>
+                <td></td>
+                <td>@Model.TotalTime.ToString(@"hh\:mm\:ss")</td>
+            </tr>
+        </table>
+    }
+    else
+    {
+        <h4>Data is unavailable</h4>
+    }
+</div>

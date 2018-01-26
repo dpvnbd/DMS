@@ -20,9 +20,12 @@
         </a>
     }
 
-    <hr/>
+    <hr />
     <a asp-action="Index" asp-controller="Document" asp-route-authorId="@Model.Id">
         Find user's documents
+    </a> |
+    <a asp-action="StatusCount" asp-controller="Reports" asp-route-userId="@Model.Id">
+        User's stats
     </a>
     <hr />
     <dl class="dl-horizontal">

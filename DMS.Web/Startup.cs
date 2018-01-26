@@ -6,9 +6,12 @@ using AutoMapper;
 using DMS.Application.Authentication;
 using DMS.Application.Documents;
 using DMS.Application.Infrastructure;
+using DMS.Application.Reports;
 using DMS.Application.Users;
 using DMS.Domain.Abstract;
+using DMS.Domain.Abstract.Services;
 using DMS.Domain.Entities;
+using DMS.Domain.Services;
 using DMS.Infrastructure;
 using DMS.Infrastructure.Data;
 using DMS.Infrastructure.Data.Identity;
@@ -54,9 +57,12 @@ namespace DMS.Web
       services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
       services.AddScoped<IRepository<Document>, DocumentRepository>();
 
+      services.AddScoped<IReportingService, ReportingService>();
+
       services.AddScoped<IAuthService, AuthService>();
       services.AddScoped<IAppDocumentService, AppDocumentService>();
       services.AddScoped<IAppUserService, AppUserService>();
+      services.AddScoped<IAppReportsService, AppReportsService>();
 
       services.AddAutoMapper();
 

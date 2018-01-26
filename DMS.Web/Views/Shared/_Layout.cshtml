@@ -2,8 +2,8 @@
 @using DMS.Application.DTOs.Users
 @inject IAuthService authService
 
-@{ 
-  UserSummaryDto user = authService.GetUserByClaims(User).Result;
+@{
+    UserSummaryDto user = authService.GetUserByClaims(User).Result;
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -36,31 +36,45 @@
 
         <div class="collapse navbar-collapse" id="mainNavbar">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item">
-                    <a class="nav-item nav-link" asp-action="Index" asp-controller="Document">All documents</a>
-                </li>
                 @if (user != null)
                 {
-                <li class="nav-item">
-                    <a class="nav-item nav-link" asp-action="Index" asp-controller="Document"
-                       asp-route-authorId="@user.Id">My documents</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-item nav-link" asp-action="Index" asp-controller="Document"
-                        asp-route-requireAttention="@true">Awaiting my review</a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-item nav-link" asp-action="Index" asp-controller="Document">All documents</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-item nav-link" asp-action="Index" asp-controller="Document"
+                           asp-route-authorId="@user.Id">My documents</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-item nav-link" asp-action="Index" asp-controller="Document"
+                           asp-route-requireAttention="@true">Awaiting my review</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-item nav-link" asp-action="Index" asp-controller="User">Users</a>
+                    </li>
+
+                    <li class="nav-item dropdown dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownReports"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Reports
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownReports">
+                            <a asp-controller="Reports" asp-action="StatusCount" class="dropdown-item">Status count</a>
+                            <a asp-controller="Reports" asp-action="ReviewTime" class="dropdown-item">Average review time</a>
+                        </div>                        
+                    </li>
                 }
-                <li class="nav-item">
-                    <a class="nav-item nav-link" asp-action="Index" asp-controller="User">Users</a>
-                </li>
             </ul>
 
             <ul class="navbar-nav">
                 @if (User.Identity.IsAuthenticated && user != null)
                 {
                     <li class="nav-item dropdown dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownAccount" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <user-badge user="@user"/>
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownAccount"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <user-badge user="@user" />
                         </a>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
                             <a asp-controller="User" asp-action="Details" asp-route-id="@user.Id" class="dropdown-item">Profile</a>

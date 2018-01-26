@@ -19,14 +19,14 @@
             @if (d.CreatorOnBehalfOfAuthor != null)
             {
                 var user = d.CreatorOnBehalfOfAuthor;
-                @:(Created on user's behalf by 
+                @:(Created on user's behalf by
                 <a asp-action="Details" asp-controller="User" asp-route-id="@user.Id">
                     <user-badge user="@user" />
                 </a>
                 @:)
             }
 
-            
+
             on @Html.DisplayFor(model => d.Created)
         </h6>
     </div>
@@ -34,22 +34,22 @@
         <p class="card-text">
             @Html.DisplayFor(model => d.Body)
         </p>
-        @if (d.CanEdit)
-        {
-            <a asp-action="Edit" asp-route-id="@d.Id" class="card-link">
-                Edit
-            </a>
-        }
-
-        @if (User.IsInRole("Admin"))
-        {
-            <a asp-action="Delete" asp-route-id="@d.Id" class="card-link">
-                Delete
-            </a>
-        }
     </div>
 </div>
+<a asp-action="ReviewTime" asp-controller="Reports" asp-route-documentId="@d.Id">Document's stats</a>
+@if (d.CanEdit)
+{
+    <a asp-action="Edit" asp-route-id="@d.Id" class="card-link">
+        Edit
+    </a>
+}
 
+@if (User.IsInRole("Admin"))
+{
+    <a asp-action="Delete" asp-route-id="@d.Id" class="card-link">
+        Delete
+    </a>
+}
 
 
 @if (d.AvailableStatusChanges != null && d.AvailableStatusChanges.Any())

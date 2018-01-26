@@ -1,0 +1,101 @@
+﻿@model DMS.Application.DTOs.Reports.StatusCountDto
+
+@{
+    ViewData["Title"] = "Status count report";
+}
+
+<div>
+    <h3>
+        @if (Model.TargetUser != null)
+        {
+            @: Stats for
+            <a asp-action="Details" asp-controller="User" asp-route-id="@Model.TargetUser.Id">
+                <user-badge user="Model.TargetUser" />
+            </a>
+        }
+
+        @if (Model.FromDate.HasValue)
+        {
+            @: From
+            @Model.FromDate.Value.ToShortDateString()
+        }
+
+        @if (Model.ToDate.HasValue)
+        {
+            @: To
+            @Model.ToDate.Value.ToShortDateString()
+        }
+    </h3>
+    <hr />
+    <h4>Document count by status</h4>
+    @if (Model.DocumentsCurrentStatusCount != null && Model.DocumentsCurrentStatusCount.Any())
+    {
+        <table class="table">
+            <tr>
+                <th>Document status</th>
+                <th>Documents count</th>
+            </tr>
+            @foreach (var statusPair in Model.DocumentsCurrentStatusCount)
+            {
+                if (statusPair.Value != 0)
+                {
+                    <tr>
+                        <td>
+                            <a asp-action="Index" asp-controller="Document" asp-route-status="@statusPair.Key">
+                                <document-status-badge status="statusPair.Key" />
+                            </a>
+                        </td>
+                        <td>
+                            <a asp-action="Index" asp-controller="Document" asp-route-status="@statusPair.Key">
+                                @statusPair.Value
+                            </a>
+
+                        </td>
+                    </tr>
+                }
+            }
+            <tr>
+                <td><b>Total</b></td>
+                <td>@Model.TotalDocuments</td>
+            </tr>
+        </table>
+    }
+    else
+    {
+        <h4>Data is unavailable</h4>
+    }
+    <hr />
+
+    <h4>Status changes count</h4>
+    @if (Model.StatusChangesCount != null && Model.StatusChangesCount.Any())
+    {
+        <table class="table">
+            <tr>
+                <th>Document status</th>
+                <th>Status changes count</th>
+            </tr>
+            @foreach (var statusPair in Model.StatusChangesCount)
+            {
+                if (statusPair.Value != 0)
+                {
+                    <tr>
+                        <td>
+                            <document-status-badge status="statusPair.Key" />
+                        </td>
+                        <td>
+                            @statusPair.Value
+                        </td>
+                    </tr>
+                }
+            }
+            <tr>
+                <td><b>Total</b></td>
+                <td>@Model.TotalChanges</td>
+            </tr>
+        </table>
+    }
+    else
+    {
+        <h4>Data is unavailable</h4>
+    }
+</div>
