@@ -34,22 +34,27 @@
         <p class="card-text">
             @Html.DisplayFor(model => d.Body)
         </p>
+        <a asp-action="ReviewTime" asp-controller="Reports" asp-route-documentId="@d.Id" class="card-link">
+            Document's stats
+        </a>
+
+        @if (d.CanEdit)
+        {            
+            <a asp-action="Edit" asp-route-id="@d.Id" class="card-link">
+                Edit
+            </a>
+        }
+
+        @if (User.IsInRole("Admin"))
+        {            
+            <a asp-action="Delete" asp-route-id="@d.Id" class="card-link">
+                Delete
+            </a>
+        }
+
     </div>
 </div>
-<a asp-action="ReviewTime" asp-controller="Reports" asp-route-documentId="@d.Id">Document's stats</a>
-@if (d.CanEdit)
-{
-    <a asp-action="Edit" asp-route-id="@d.Id" class="card-link">
-        Edit
-    </a>
-}
 
-@if (User.IsInRole("Admin"))
-{
-    <a asp-action="Delete" asp-route-id="@d.Id" class="card-link">
-        Delete
-    </a>
-}
 
 
 @if (d.AvailableStatusChanges != null && d.AvailableStatusChanges.Any())
