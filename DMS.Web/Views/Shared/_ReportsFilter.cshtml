@@ -1,0 +1,11 @@
+﻿@model DMS.Web.Models.Reports.ReportsFilterViewModel
+
+<form method="get" class="form-inline">
+    @Html.HiddenFor(f => f.DocumentId)
+    @Html.HiddenFor(f => f.UserId)
+    
+    <label class="mr-2">From </label> <input asp-for="From" type="date" class="form-control mr-sm-2 mb-1" />
+    <label class="mr-2">To </label> <input asp-for="To" type="date" class="form-control mr-sm-2 mb-1" />
+
+    <button type="submit" class="btn btn-info mb-1">Filter</button>
+</form>

@@ -1,7 +1,8 @@
 ﻿@model DMS.Application.DTOs.Reports.StatusCountDto
-
+@using DMS.Web.Models.Reports
 @{
     ViewData["Title"] = "Status count report";
+    var filter = (ReportsFilterViewModel)ViewData["filter"] ?? new ReportsFilterViewModel();
 }
 
 <div>
@@ -26,6 +27,8 @@
             @Model.ToDate.Value.ToShortDateString()
         }
     </h3>
+    <hr />
+    @Html.Partial("_ReportsFilter", filter)
     <hr />
     <h4>Document count by status</h4>
     @if (Model.DocumentsCurrentStatusCount != null && Model.DocumentsCurrentStatusCount.Any())
@@ -65,7 +68,6 @@
         <h4>Data is unavailable</h4>
     }
     <hr />
-
     <h4>Status changes count</h4>
     @if (Model.StatusChangesCount != null && Model.StatusChangesCount.Any())
     {

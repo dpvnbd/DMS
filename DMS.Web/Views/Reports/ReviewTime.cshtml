@@ -1,7 +1,8 @@
 ﻿@model DMS.Application.DTOs.Reports.StatusChangesTimeDto
-
+@using DMS.Web.Models.Reports
 @{
     ViewData["Title"] = "Review time report";
+    var filter = (ReportsFilterViewModel)ViewData["filter"] ?? new ReportsFilterViewModel();
 }
 
 
@@ -32,6 +33,8 @@
         }
     </h3>
     <hr />
+    @Html.Partial("_ReportsFilter", filter)
+    <hr />
     <h4>
         @if (Model.TargetDocument != null)
         {
@@ -41,7 +44,7 @@
         {
             @:Average
         }
-        durations of transitions between different stages
+        time of transitions between different stages
     </h4>
     @if (Model.StatusChangesTime != null && Model.StatusChangesTime.Any())
     {
@@ -65,7 +68,7 @@
 
                     </td>
                     <td>
-                            @statusPair.Value.ToString(@"hh\:mm\:ss")
+                        @statusPair.Value.ToString(@"hh\:mm\:ss")
                     </td>
                 </tr>
 
