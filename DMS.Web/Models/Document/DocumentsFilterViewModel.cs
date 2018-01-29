@@ -18,5 +18,10 @@ namespace DMS.Web.Models.Document
 
     [StringLength(100)]
     public string SearchString  { get; set; }
+
+    public DateTime? From { get; set; }
+
+    public DateTime? To { get; set; }
+
   }
 }

@@ -44,9 +44,10 @@ namespace DMS.Web.Controllers
     public async Task<IActionResult> Index(int? authorId, DocumentStatus? status, string searchString, bool requireAttention,
       DateTime? from = null, DateTime? to = null)
     {
-      var userId = await authService.GetUserIdByClaims(User);      
-
+      var userId = await authService.GetUserIdByClaims(User);
+      
       var documents = await documentService.FindDocuments(authorId??-1, status, searchString, userId, requireAttention, from, to);
+
       if (documents == null)
       {
         return NotFound();
@@ -57,7 +58,9 @@ namespace DMS.Web.Controllers
       {
         SearchString = searchString,
         Status = status,
-        RequireAttention = requireAttention
+        RequireAttention = requireAttention,
+        From = from,
+        To = to
       };
       if (authorId.HasValue)
       {
