@@ -61,7 +61,7 @@
         </label>
     </div>
     <select asp-for="Status" asp-items="Html.GetEnumSelectList<DocumentStatus>()" class="form-control mr-sm-2 mb-1">
-        <option selected>Any status</option>
+        <option value="@null" selected>Any status</option>
     </select>
 
     <input asp-for="SearchString" class="form-control mr-sm-2 mb-1" placeholder="Search content" />

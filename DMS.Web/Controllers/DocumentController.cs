@@ -44,6 +44,11 @@ namespace DMS.Web.Controllers
     public async Task<IActionResult> Index(int? authorId, DocumentStatus? status, string searchString, bool requireAttention,
       DateTime? from = null, DateTime? to = null)
     {
+      if (!ModelState.IsValid)
+      {
+        return View("Index", new DocumentsFilterViewModel());
+      }
+
       var userId = await authService.GetUserIdByClaims(User);
       
       var documents = await documentService.FindDocuments(authorId??-1, status, searchString, userId, requireAttention, from, to);
@@ -52,6 +57,7 @@ namespace DMS.Web.Controllers
       {
         return NotFound();
       }
+
       ViewData["documents"] = documents;
 
       var filterModel = new DocumentsFilterViewModel
