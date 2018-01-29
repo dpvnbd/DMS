@@ -58,6 +58,7 @@ namespace DMS.Web
       services.AddScoped<IRepository<Document>, DocumentRepository>();
 
       services.AddScoped<IReportingService, ReportingService>();
+      services.AddScoped<IDocumentFilteringService, DocumentFilteringService>();
 
       services.AddScoped<IAuthService, AuthService>();
       services.AddScoped<IAppDocumentService, AppDocumentService>();

@@ -17,15 +17,20 @@ namespace DMS.Application.Reports
   {
     private readonly IReportingService reportingService;
     private readonly IRepository<Document> docRepo;
+    private readonly IRepository<DocumentHistoryEntry> historyRepo;
     private readonly IRepository<AppUser> userRepo;
+    private readonly IDocumentFilteringService filteringService;
     private readonly IMapper mapper;
 
     public AppReportsService(IReportingService reportingService, IRepository<Document> docRepo,
-      IRepository<AppUser> userRepo, IMapper mapper)
+      IRepository<DocumentHistoryEntry> historyRepo, IRepository<AppUser> userRepo,
+      IDocumentFilteringService filteringService, IMapper mapper)
     {
       this.reportingService = reportingService;
       this.docRepo = docRepo;
+      this.historyRepo = historyRepo;
       this.userRepo = userRepo;
+      this.filteringService = filteringService;
       this.mapper = mapper;
     }
 
@@ -51,11 +56,12 @@ namespace DMS.Application.Reports
 
       if(document != null)
       {
-        result.StatusChangesTime = reportingService.TimeBetweenStatusChanges(document);
+        result.StatusChangesTime = reportingService.TimeBetweenStatusChanges(document.History);
       }
       else
       {
-        result.StatusChangesTime = reportingService.AverageTimeBetweenStatusChanges(fromDate, toDate);
+        var documents = filteringService.Filter(docRepo.GetAll(), fromDate: fromDate, toDate: toDate);
+        result.StatusChangesTime = reportingService.AverageTimeBetweenStatusChanges(documents);
       }
 
       result.TotalTime = new TimeSpan(result.StatusChangesTime.Values.Sum(t => t.Ticks));
@@ -81,10 +87,34 @@ namespace DMS.Application.Reports
         result.TargetUser = mapper.Map<UserSummaryDto>(user);
       }
 
-      result.DocumentsCurrentStatusCount = reportingService.CountDocumentsByStatus(user, fromDate, toDate);
+      var documents = filteringService.Filter(docRepo.GetAll(), user, fromDate: fromDate, toDate: toDate);
+
+      result.DocumentsCurrentStatusCount = reportingService.CountDocumentsByStatus(documents);
       result.TotalDocuments = result.DocumentsCurrentStatusCount.Values.Sum();
 
-      result.StatusChangesCount = reportingService.CountStatusChanges(user, fromDate, toDate);
+      // TODO - move status filtering logic to another place
+      bool historyPredicate(DocumentHistoryEntry e)
+      {
+        if (user != null && e.User.Id != user.Id)
+        {
+          return false;
+        }
+
+        if (fromDate.HasValue && e.Created < fromDate.Value)
+        {
+          return false;
+        }
+
+        if (toDate.HasValue && e.Created > toDate.Value)
+        {
+          return false;
+        }
+
+        return true;
+      }
+
+      var statusChanges = historyRepo.GetAll().Where(historyPredicate);
+      result.StatusChangesCount = reportingService.CountStatusChanges(statusChanges.AsQueryable());
       result.TotalChanges = result.StatusChangesCount.Values.Sum();
 
 

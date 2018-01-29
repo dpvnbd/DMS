@@ -8,6 +8,7 @@ using DMS.Application.DTOs;
 using DMS.Application.DTOs.Documents;
 using DMS.Domain.Abstract;
 using DMS.Domain.Entities;
+using DMS.Domain.Abstract.Services;
 
 namespace DMS.Application.Documents
 {
@@ -16,12 +17,15 @@ namespace DMS.Application.Documents
     private readonly IRepository<Document> docRepo;
     private readonly IRepository<AppUser> userRepo;
     private readonly IMapper mapper;
+    private readonly IDocumentFilteringService filteringService;
 
-    public AppDocumentService(IRepository<Document> docRepo, IRepository<AppUser> userRepo, IMapper mapper)
+    public AppDocumentService(IRepository<Document> docRepo, IRepository<AppUser> userRepo, IDocumentFilteringService filteringService,
+      IMapper mapper)
     {
       this.docRepo = docRepo;
       this.userRepo = userRepo;
       this.mapper = mapper;
+      this.filteringService = filteringService;
     }
     
     public async Task<int> CreateDocument(DocumentContentsDto d, int authorId)
@@ -118,34 +122,46 @@ namespace DMS.Application.Documents
       return true;
     }
 
-    public async Task<IEnumerable<DocumentSummaryDto>> FindDocuments(Func<Document, bool> predicate,
-      int requestingUserId = -1, bool filterAvailableForReview = false)
+    public async Task<IEnumerable<DocumentSummaryDto>> FindDocuments(int authorId = -1, DocumentStatus? status = null,
+      string searchString = null, int requestingUserId = -1, bool canBeReviewed = false,
+      DateTime? fromDate = null, DateTime? toDate = null)
     {
-      var documents = docRepo.GetAll().Where(predicate);
+      AppUser author = null;
+      AppUser requestingUser = null;
+
+      if(authorId != -1)
+      {
+        author = await userRepo.GetById(authorId);
+        if(author == null)
+        {
+          return Array.Empty<DocumentSummaryDto>();
+        }
+      }
 
       if (requestingUserId != -1)
       {
-        var user = await userRepo.GetById(requestingUserId);
-        if (user != null)
+        requestingUser = await userRepo.GetById(requestingUserId);
+        if (requestingUser == null)
         {
-          var summaries = new List<DocumentSummaryDto>(documents.Count());
-          foreach(var d in documents)
-          {
-            var canEdit = d.CanEdit(user); ;
-            if (filterAvailableForReview)
-            {
-              if (!d.AvailableStatusChanges(user).Any() && !canEdit)
-              {
-                continue;
-              }
-            }
-            var summary = mapper.Map<DocumentSummaryDto>(d);
-            summary.CanEdit = canEdit;
-            summaries.Add(summary);
-          }          
-          return summaries;
+          return Array.Empty<DocumentSummaryDto>();
         }
       }
+
+      var documents = filteringService.Filter(docRepo.GetAll(),
+        author, status, searchString, canBeReviewed ? requestingUser : null, fromDate, toDate);
+
+      if(requestingUser != null)
+      {
+        var dtos = new List<DocumentSummaryDto>(documents.Count());
+        foreach(var d in documents)
+        {
+          var summary = mapper.Map<DocumentSummaryDto>(d);
+          summary.CanEdit = d.CanEdit(requestingUser);
+          dtos.Add(summary);
+        }
+        return dtos;
+      }
+
       return mapper.Map<IEnumerable<DocumentSummaryDto>>(documents);
     }
 
@@ -167,6 +183,10 @@ namespace DMS.Application.Documents
       return true;
     }
 
-
+    public async Task<DocumentSummaryDto> GetDocumentSummary(int id)
+    {
+      var document = await docRepo.GetById(id);
+      return mapper.Map<DocumentSummaryDto>(document);
+    }
   }
 }

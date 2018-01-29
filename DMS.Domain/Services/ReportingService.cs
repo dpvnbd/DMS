@@ -29,34 +29,7 @@ namespace DMS.Domain.Services
         result[status] = documents.Count(d => d.CurrentStatus == status);
       }
       return result;
-    }
-
-
-    public IDictionary<DocumentStatus, int> CountDocumentsByStatus(AppUser user = null,
-      DateTime? fromDate = null, DateTime? toDate = null)
-    {
-      bool documentsPredicate(Document d)
-      {
-        if (user != null && d.Author.Id != user.Id)
-        {
-          return false;
-        }
-
-        if (fromDate.HasValue && d.Created < fromDate.Value)
-        {
-          return false;
-        }
-
-        if (toDate.HasValue && d.Created > toDate.Value)
-        {
-          return false;
-        }
-
-        return true;
-      }
-
-      return CountDocumentsByStatus(docRepo.GetAll().Where(documentsPredicate).AsQueryable());    
-    }
+    }   
 
     public IDictionary<DocumentStatus, int> CountStatusChanges(IQueryable<DocumentHistoryEntry> historyEntries)
     {
@@ -67,33 +40,7 @@ namespace DMS.Domain.Services
         result[status] = historyEntries.Count(e => e.Status.HasValue && e.Status.Value == status);
       }
       return result;
-    }
-
-    public IDictionary<DocumentStatus, int> CountStatusChanges(AppUser user = null,
-      DateTime? fromDate = null, DateTime? toDate = null)
-    {
-      bool historyPredicate(DocumentHistoryEntry e)
-      {
-        if (user != null && e.User.Id != user.Id)
-        {
-          return false;
-        }
-
-        if (fromDate.HasValue && e.Created < fromDate.Value)
-        {
-          return false;
-        }
-
-        if (toDate.HasValue && e.Created > toDate.Value)
-        {
-          return false;
-        }
-
-        return true;
-      }
-      
-      return CountStatusChanges(historyRepo.GetAll().Where(historyPredicate).AsQueryable());
-    }
+    }   
 
     public IDictionary<StatusChange, TimeSpan> TimeBetweenStatusChanges(Document document)
     {
@@ -168,29 +115,6 @@ namespace DMS.Domain.Services
     {
       var histories = documents.Select(d => d.History);
       return AverageTimeBetweenStatusChanges(histories);
-    }
-
-    public IDictionary<StatusChange, TimeSpan> AverageTimeBetweenStatusChanges(DateTime? fromDate = null, DateTime? toDate = null)
-    {
-      bool periodPredicate(Document d)
-      {
-        if (fromDate.HasValue && d.Created < fromDate.Value)
-        {
-          return false;
-        }
-
-        if (toDate.HasValue && d.Created > toDate.Value)
-        {
-          return false;
-        }
-
-        return true;
-      }
-      var documents = docRepo.GetAll().Where(periodPredicate).AsQueryable();
-
-      return AverageTimeBetweenStatusChanges(documents);
-    }
-
-  
+    }  
   }
 }

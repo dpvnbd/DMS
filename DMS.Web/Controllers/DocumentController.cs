@@ -41,35 +41,12 @@ namespace DMS.Web.Controllers
     //}
 
     [HttpGet]
-    public async Task<IActionResult> Index(int? authorId, DocumentStatus? status, string searchString, bool requireAttention)
+    public async Task<IActionResult> Index(int? authorId, DocumentStatus? status, string searchString, bool requireAttention,
+      DateTime? from = null, DateTime? to = null)
     {
-      var userId = await authService.GetUserIdByClaims(User);
-      
+      var userId = await authService.GetUserIdByClaims(User);      
 
-      bool predicate(Document d)
-      {
-        if (authorId.HasValue && d.Author.Id != authorId.Value)
-        {
-          return false;
-        }
-
-        if (status.HasValue && d.CurrentStatus != status.Value)
-        {
-          return false;
-        }
-
-        if (!string.IsNullOrWhiteSpace(searchString))
-        {
-          if (!d.Title.Contains(searchString)
-          && !d.Body.Contains(searchString))
-          {
-            return false;
-          }
-        }
-        return true;
-      }
-
-      var documents = await documentService.FindDocuments(predicate, userId, requireAttention);
+      var documents = await documentService.FindDocuments(authorId??-1, status, searchString, userId, requireAttention, from, to);
       if (documents == null)
       {
         return NotFound();
@@ -243,8 +220,7 @@ namespace DMS.Web.Controllers
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int id)
     {
-      var documents = await documentService.FindDocuments(d => d.Id == id);
-      var document = documents.FirstOrDefault();
+      var document = await documentService.GetDocumentSummary(id);
       if (document == null)
       {
         return NotFound();
